@@ -1,4 +1,4 @@
-# ramuda
+# λ ramuda
 
 Functional programming helper library for PHP based on [Ramda.js](https://ramdajs.com/)
 
