@@ -19,10 +19,7 @@
 		use Closure;
 		use RecursiveArrayIterator;
 		use RecursiveIteratorIterator;
-		use ReflectionException;
 		use ReflectionFunction;
-		use ReflectionMethod;
-		use ReflectionObject;
 		use stdClass;
 		use Traversable;
 
@@ -132,7 +129,7 @@
 			 * @return Closure
 			 */
 			public static function ap($fArr = null, $vArr = null){
-				return static::_curry2(function($fArr, $vArr){
+				return static::curryN(2, function($fArr, $vArr){
 					$results = [];
 
 					foreach($fArr as $f){
@@ -142,7 +139,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -153,9 +150,9 @@
 			 * @return Closure
 			 */
 			public static function apply($f = null, $argArr = null){
-				return static::_curry2(function($f, $argArr){
+				return static::curryN(2, function($f, $argArr){
 					return call_user_func_array($f, $argArr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -172,9 +169,9 @@
 			 * @return Closure
 			 */
 			public static function applyTo($x = null, $f = null){
-				return static::_curry2(function($x, $f){
+				return static::curryN(2, function($x, $f){
 					return $f($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -186,7 +183,7 @@
 			 * @return Closure
 			 */
 			public static function ascend($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					$xx = $f($x);
 					$yy = $f($y);
 
@@ -198,7 +195,7 @@
 					}
 
 					return 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -228,7 +225,7 @@
 			 * @return Closure
 			 */
 			public static function comparator($pred = null, $x = null, $y = null){
-				return static::_curry3(function($pred, $x, $y){
+				return static::curryN(3, function($pred, $x, $y){
 					if($pred($x, $y)){
 						return -1;
 					}
@@ -237,7 +234,7 @@
 					}
 
 					return 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -264,7 +261,7 @@
 			 * @return Closure
 			 */
 			public static function composeWith($f = null, $fArr = null){
-				return static::_curry2(function($f, $fArr){
+				return static::curryN(2, function($f, $fArr){
 					return function($val) use ($f, $fArr){
 						/** @var array $newFArr */
 						$newFArr = static::reverse($fArr);
@@ -273,7 +270,7 @@
 							return $f($fItem, $acc);
 						}, $val);
 					};
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -303,28 +300,58 @@
 			/**
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#curry
-			 * @param callable|null $function
-			 * @param array $initialArguments
+			 * @param callable|null $f
 			 * @return Closure
 			 */
-			public static function curry($function = null, ...$initialArguments){
-				return static::_curry1(function(callable $function, ...$initialArguments){
-					return static::_curryN(static::_getArity($function), $function, ...$initialArguments);
-				}, func_get_args());
+			public static function curry($f){
+				$r = new ReflectionFunction($f);
+				return static::curryN($r->getNumberOfParameters(), $f);
 			}
 
 			/**
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#curryN
-			 * @param int|null $length
-			 * @param callable|null $function
-			 * @param array $initialArguments
+			 * @param int|null $n
+			 * @param callable|null $f
 			 * @return Closure
 			 */
-			public static function curryN($length = null, $function = null, ...$initialArguments){
-				return static::_curry2(function($length, callable $function, ...$initialArguments){
-					return static::_curryN($length, $function, ...$initialArguments);
-				}, func_get_args());
+			public static function curryN($n, $f){
+				$curryNRec = function($recv) use ($n, $f, &$curryNRec){
+					return function() use ($recv, $n, $f, &$curryNRec){
+						$left = $n;
+						$argsIdx = 0;
+						$combined = array();
+						$combinedIdx = 0;
+						$args = func_get_args();
+
+						while($combinedIdx < count($recv) || $argsIdx < count($args)){
+							if($combinedIdx < count($recv)
+								&& ($recv[$combinedIdx] !== static::_() || $argsIdx > count($args))){
+								$result = $recv[$combinedIdx];
+							}
+							else{
+								$result = $args[$argsIdx];
+								$argsIdx += 1;
+							}
+
+							$combined[$combinedIdx] = $result;
+							$combinedIdx += 1;
+
+							if($result !== static::_()){
+								$left -= 1;
+							}
+						}
+
+						if($left <= 0){
+							return call_user_func_array($f, $combined);
+						}
+						else{
+							return $curryNRec($combined);
+						}
+					};
+				};
+
+				return $curryNRec([]);
 			}
 
 			/**
@@ -336,7 +363,7 @@
 			 * @return Closure
 			 */
 			public static function descend($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					$xx = $f($x);
 					$yy = $f($y);
 
@@ -348,7 +375,7 @@
 					}
 
 					return 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -358,7 +385,7 @@
 			 * @return Closure
 			 */
 			public static function emptyVal($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -378,7 +405,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -412,9 +439,9 @@
 			 * @return Closure
 			 */
 			public static function hook($f = null, $val = null){
-				return static::_curry2(function($f, $val){
+				return static::curryN(2, function($f, $val){
 					return $f($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -424,9 +451,9 @@
 			 * @return Closure
 			 */
 			public static function identity($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -466,7 +493,7 @@
 			public static function memoizeWith($keyF = null, $f = null, $val = null){
 				$cache = [];
 
-				return static::_curry3(function($keyF, $f, $val) use (&$cache){
+				return static::curryN(3, function($keyF, $f, $val) use (&$cache){
 					$key = $keyF($val);
 
 					if(!array_key_exists($key, $cache)){
@@ -474,7 +501,7 @@
 					}
 
 					return $cache[$key];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -504,9 +531,9 @@
 			 * @return Closure
 			 */
 			public static function o($f1 = null, $f2 = null, $x = null){
-				return static::_curry3(function($f1, $f2, $x){
+				return static::curryN(3, function($f1, $f2, $x){
 					return $f1($f2($x));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -516,9 +543,9 @@
 			 * @return Closure
 			 */
 			public static function of($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return [$x];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -595,13 +622,13 @@
 			 * @return Closure
 			 */
 			public static function pipeWith($f = null, $fArr = null){
-				return static::_curry2(function($f, $fArr){
+				return static::curryN(2, function($f, $fArr){
 					return function($val) use ($f, $fArr){
 						return array_reduce($fArr, function($acc, $fItem) use ($f){
 							return $f($fItem, $acc);
 						}, $val);
 					};
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -623,10 +650,10 @@
 			 * @return Closure
 			 */
 			public static function tap($f = null, $val = null){
-				return static::_curry2(function($f, $val){
+				return static::curryN(2, function($f, $val){
 					$f($val);
 					return $val;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -638,7 +665,7 @@
 			 * @return Closure
 			 */
 			public static function toggle($val1 = null, $val2 = null, $val3 = null){
-				return static::_curry3(function($val1, $val2, $val3){
+				return static::curryN(3, function($val1, $val2, $val3){
 					if($val3 === $val1){
 						return $val2;
 					}
@@ -647,7 +674,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -711,11 +738,11 @@
 			 * @return Closure
 			 */
 			public static function adjust($index = null, $f = null, $arr = null){
-				return static::_curry3(function($index, $f, $arr){
+				return static::curryN(3, function($index, $f, $arr){
 					$copy = static::arrayClone($arr);
 					$copy[$index] = $f($copy[$index]);
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -726,7 +753,7 @@
 			 * @return Closure
 			 */
 			public static function all($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					foreach($arr as $item){
 						if($pred($item) === false){
 							return false;
@@ -734,7 +761,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -744,7 +771,7 @@
 			 * @return Closure
 			 */
 			public static function allEqual($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$val = static::head($arr);
 
 					foreach($arr as $item){
@@ -754,7 +781,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -765,7 +792,7 @@
 			 * @return Closure
 			 */
 			public static function allEqualTo($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					foreach($arr as $item){
 						if($item !== $x){
 							return false;
@@ -773,7 +800,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -783,21 +810,22 @@
 			 * @return Closure
 			 */
 			public static function allUnique($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					/** @var array $u */
 					$u = static::uniq($arr);
 					return count($u) === count($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#any
 			 * @param callable $pred
+			 * @param mixed[] $arr
 			 * @return Closure
 			 */
-			public static function any($pred){
-				return static::_curry2(function($pred, $arr){
+			public static function any($pred = null, $arr = null){
+				return static::curryN(2, function($pred, $arr){
 					foreach($arr as $item){
 						if($pred($item) === false){
 							return true;
@@ -805,7 +833,7 @@
 					}
 
 					return false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -816,7 +844,7 @@
 			 * @return Closure
 			 */
 			public static function aperture($size = null, $arr = null){
-				return static::_curry2(function($size, $arr){
+				return static::curryN(2, function($size, $arr){
 					$len = count($arr);
 					$result = [];
 
@@ -833,7 +861,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -844,13 +872,13 @@
 			 * @return Closure
 			 */
 			public static function append($val = null, $arr = null){
-				return static::_curry2(function($val, $arr){
+				return static::curryN(2, function($val, $arr){
 					/** @var array $copy */
 					$copy = static::arrayClone($arr);
 					array_push($copy, $val);
 
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -860,9 +888,9 @@
 			 * @return Closure
 			 */
 			public static function arrayClone($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return array_merge([], $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -873,9 +901,9 @@
 			 * @return Closure
 			 */
 			public static function arrayOf($key = null, $val = null){
-				return static::_curry2(function($key, $val){
+				return static::curryN(2, function($key, $val){
 					return [$key => $val];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -886,7 +914,7 @@
 			 * @return Closure
 			 */
 			public static function chain($f = null, $arr = null){
-				return static::_curry2(function($f, $arr){
+				return static::curryN(2, function($f, $arr){
 					$flattened = [];
 
 					foreach($arr as $index => $element){
@@ -903,7 +931,7 @@
 					}
 
 					return $flattened;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -913,11 +941,11 @@
 			 * @return Closure
 			 */
 			public static function compact($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return static::filter(function($x){
 						return !!$x;
 					}, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -928,7 +956,7 @@
 			 * @return Closure
 			 */
 			public static function concat($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$xType = static::type($x);
 					$yType = static::type($y);
 
@@ -941,7 +969,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -952,10 +980,10 @@
 			 * @return Closure
 			 */
 			public static function containsAll($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$p = static::pipe(static::difference($x), static::isEmpty());
 					return $p($y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -966,10 +994,10 @@
 			 * @return Closure
 			 */
 			public static function containsAny($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$p = static::pipe(static::intersection($x), static::isEmpty(), static::not());
 					return $p($y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -980,20 +1008,21 @@
 			 * @return Closure
 			 */
 			public static function containsNone($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$p = static::pipe(static::intersection($x), static::isEmpty());
 					return $p($y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#concat
 			 * @param string|array $x
+			 * @param string|array $y
 			 * @return Closure
 			 */
-			public static function concatRight($x){
-				return static::_curry2(function($x, $y){
+			public static function concatRight($x = null, $y = null){
+				return static::curryN(2, function($x, $y){
 					$xType = static::type($x);
 					$yType = static::type($y);
 
@@ -1006,7 +1035,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1017,7 +1046,7 @@
 			 * @return Closure
 			 */
 			public static function drop($count = null, $x = null){
-				return static::_curry2(function($count, $x){
+				return static::curryN(2, function($count, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1029,7 +1058,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1040,7 +1069,7 @@
 			 * @return Closure
 			 */
 			public static function dropLast($count = null, $x = null){
-				return static::_curry2(function($count, $x){
+				return static::curryN(2, function($count, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1052,7 +1081,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1063,7 +1092,7 @@
 			 * @return Closure
 			 */
 			public static function dropLastWhile($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1077,7 +1106,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1087,7 +1116,7 @@
 			 * @return Closure
 			 */
 			public static function dropRepeats($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$result = [];
 
 					foreach($x as $val){
@@ -1097,7 +1126,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1108,7 +1137,7 @@
 			 * @return Closure
 			 */
 			public static function dropRepeatsWith($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$result = [static::head($x)];
 
 					foreach($x as $val){
@@ -1120,7 +1149,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1131,7 +1160,7 @@
 			 * @return Closure
 			 */
 			public static function dropWhile($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 
 					$unsetTil = function($arr) use ($pred){
@@ -1158,7 +1187,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1168,9 +1197,9 @@
 			 * @return Closure
 			 */
 			public static function duplicate($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return [$x, $x];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1181,13 +1210,13 @@
 			 * @return Closure
 			 */
 			public static function each($f = null, $arr = null){
-				return static::_curry2(function($f, $arr){
+				return static::curryN(2, function($f, $arr){
 					foreach($arr as $val){
 						$f($val);
 					}
 
 					return $arr;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1198,7 +1227,7 @@
 			 * @return Closure
 			 */
 			public static function endsWith($val = null, $x = null){
-				return static::_curry2(function($val, $x){
+				return static::curryN(2, function($val, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1209,7 +1238,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1219,9 +1248,9 @@
 			 * @return Closure
 			 */
 			public static function ensureArray($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return static::isArray($x) ? $x : [$x];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1232,7 +1261,7 @@
 			 * @return Closure
 			 */
 			public static function filter($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1258,18 +1287,18 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
 			 * @internal List
-			 * @link @link https://ramdajs.com/docs/#find
+			 * @link https://ramdajs.com/docs/#find
 			 * @param callable $pred
 			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function find($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					foreach($arr as $val){
 						if($pred($val)){
 							return $val;
@@ -1277,21 +1306,22 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
 			 * @internal List
-			 * Returns array of items at provided indexes.
+			 * Returns array of items found at provided indexes.
 			 * @param int[]|string[] $idx
+			 * @param array $arr
 			 * @return Closure
 			 */
-			public static function findAtIndexes($idx){
-				return static::_curry2(function($idx, $x){
-					return static::map(function($val) use ($x){
-						return $x[$val];
+			public static function findAtIndexes($idx = null, $arr = null){
+				return static::curryN(2, function($idx, $arr){
+					return static::map(function($val) use ($arr){
+						return $arr[$val];
 					}, $idx);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1302,7 +1332,7 @@
 			 * @return Closure
 			 */
 			public static function findIndex($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					for($n = 0; $n < count($arr); $n++){
 						if($pred($arr[$n]) === true){
 							return $n;
@@ -1310,7 +1340,7 @@
 					}
 
 					return -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1321,7 +1351,7 @@
 			 * @return Closure
 			 */
 			public static function findLast($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					for($n = count($arr) - 1; $n >= 0; $n--){
 						if($pred($arr[$n]) === true){
 							return $arr[$n];
@@ -1329,7 +1359,7 @@
 					}
 
 					return -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1340,7 +1370,7 @@
 			 * @return Closure
 			 */
 			public static function findLastIndex($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					for($n = count($arr) - 1; $n >= 0; $n--){
 						if($pred($arr[$n]) === true){
 							return $n;
@@ -1348,7 +1378,7 @@
 					}
 
 					return -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1358,7 +1388,7 @@
 			 * @return Closure
 			 */
 			public static function findNotNil($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					foreach($arr as $x){
 						if(!static::isNil($x)){
 							return $x;
@@ -1366,7 +1396,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1376,7 +1406,7 @@
 			 * @return Closure
 			 */
 			public static function flatten($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$it = new RecursiveIteratorIterator(new RecursiveArrayIterator($arr));
 					$result = [];
 
@@ -1385,7 +1415,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1395,7 +1425,7 @@
 			 * @return Closure
 			 */
 			public static function fromPairs($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$result = new stdClass();
 
 					foreach($arr as $item){
@@ -1404,7 +1434,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1415,7 +1445,7 @@
 			 * @return Closure
 			 */
 			public static function groupBy($keyFunc = null, $x = null){
-				return static::_curry2(function($keyFunc, $x){
+				return static::curryN(2, function($keyFunc, $x){
 					return static::reduce(function($acc, $val) use ($keyFunc){
 						$key = $keyFunc($val);
 
@@ -1427,7 +1457,7 @@
 
 						return $acc;
 					}, new stdClass(), $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1438,7 +1468,7 @@
 			 * @return Closure
 			 */
 			public static function groupWith($compareFunc = null, $arr = null){
-				return static::_curry2(function($compareFunc, $arr){
+				return static::curryN(2, function($compareFunc, $arr){
 					$result = [];
 					$index = 0;
 					$length = count($arr);
@@ -1455,7 +1485,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1466,9 +1496,9 @@
 			 * @return Closure
 			 */
 			public static function gtThanLength($length = null, $arr = null){
-				return static::_curry2(function($length, $arr){
+				return static::curryN(2, function($length, $arr){
 					return $length > count($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1479,9 +1509,9 @@
 			 * @return Closure
 			 */
 			public static function gteThanLength($length = null, $arr = null){
-				return static::_curry2(function($length, $arr){
+				return static::curryN(2, function($length, $arr){
 					return $length >= count($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1491,9 +1521,9 @@
 			 * @return Closure
 			 */
 			public static function head($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return reset($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1504,7 +1534,7 @@
 			 * @return Closure
 			 */
 			public static function includes($searchFor = null, $x = null){
-				return static::_curry2(function($searchFor, $x){
+				return static::curryN(2, function($searchFor, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1519,7 +1549,7 @@
 					else{
 						return null;
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1530,7 +1560,7 @@
 			 * @return Closure
 			 */
 			public static function indexBy($keyFunc = null, $arr = null){
-				return static::_curry2(function($keyFunc, $arr){
+				return static::curryN(2, function($keyFunc, $arr){
 					$result = new stdClass();
 
 					foreach($arr as $val){
@@ -1539,7 +1569,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1550,7 +1580,7 @@
 			 * @return Closure
 			 */
 			public static function indexOf($idx = null, $arr = null){
-				return static::_curry2(function($idx, $arr){
+				return static::curryN(2, function($idx, $arr){
 					for($n = 0; $n < count($arr); $n++){
 						if($arr[$n] === $idx){
 							return $n;
@@ -1558,7 +1588,7 @@
 					}
 
 					return -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1568,9 +1598,9 @@
 			 * @return Closure
 			 */
 			public static function init($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return array_slice($arr, 0, -1);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1582,13 +1612,13 @@
 			 * @return Closure
 			 */
 			public static function insert($index = null, $val = null, $arr = null){
-				return static::_curry3(function($index, $val, $arr){
+				return static::curryN(3, function($index, $val, $arr){
 					/**@var array $copy */
 					$copy = static::arrayClone($arr);
 					array_splice($copy, $index, 0, $val);
 
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1600,13 +1630,13 @@
 			 * @return Closure
 			 */
 			public static function insertAll($index = null, $valArr = null, $arr = null){
-				return static::_curry3(function($index, $valArr, $arr){
+				return static::curryN(3, function($index, $valArr, $arr){
 					/** @var array $copy */
 					$copy = static::arrayClone($arr);
 					array_splice($copy, $index, 0, $valArr);
 
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1617,7 +1647,7 @@
 			 * @return Closure
 			 */
 			public static function intersperse($val = null, $arr = null){
-				return static::_curry2(function($val, $arr){
+				return static::curryN(2, function($val, $arr){
 					$result = [];
 					$len = count($arr);
 
@@ -1630,7 +1660,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -1647,9 +1677,9 @@
 			 * @return Closure
 			 */
 			public static function join($on = null, $arr = null){
-				return static::_curry2(function($on, $arr){
+				return static::curryN(2, function($on, $arr){
 					return implode($on, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1659,9 +1689,9 @@
 			 * @return Closure
 			 */
 			public static function last($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return end($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1672,7 +1702,7 @@
 			 * @return Closure
 			 */
 			public static function lastIndexOf($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					for($n = count($arr); $n > 0; $n--){
 						if($arr[$n] === $x){
 							return $n;
@@ -1680,7 +1710,7 @@
 					}
 
 					return -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1690,7 +1720,7 @@
 			 * @return Closure
 			 */
 			public static function length($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1706,7 +1736,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1717,10 +1747,10 @@
 			 * @return Closure
 			 */
 			public static function lengthEq($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(1, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength === $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1731,10 +1761,10 @@
 			 * @return Closure
 			 */
 			public static function lengthGt($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(1, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength > $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1745,10 +1775,10 @@
 			 * @return Closure
 			 */
 			public static function lengthGte($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(1, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength >= $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1759,10 +1789,10 @@
 			 * @return Closure
 			 */
 			public static function lengthLt($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(2, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength < $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1773,10 +1803,10 @@
 			 * @return Closure
 			 */
 			public static function lengthLte($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(2, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength <= $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1787,10 +1817,10 @@
 			 * @return Closure
 			 */
 			public static function lengthNotEq($length = null, $x = null){
-				return static::_curry1(function($length, $x){
+				return static::curryN(2, function($length, $x){
 					$varLength = static::isString($x) ? strlen($x) : count($x);
 					return $varLength !== $length;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1801,9 +1831,9 @@
 			 * @return Closure
 			 */
 			public static function ltThanLength($length = null, $arr = null){
-				return static::_curry2(function($length, $arr){
+				return static::curryN(2, function($length, $arr){
 					return $length < count($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1814,9 +1844,9 @@
 			 * @return Closure
 			 */
 			public static function lteThanLength($length = null, $arr = null){
-				return static::_curry2(function($length, $arr){
+				return static::curryN(2, function($length, $arr){
 					return $length <= count($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1827,7 +1857,7 @@
 			 * @return Closure
 			 */
 			public static function map($mapper = null, $x = null){
-				return static::_curry2(function($mapper, $x){
+				return static::curryN(2, function($mapper, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -1867,7 +1897,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1878,7 +1908,7 @@
 			 * @return Closure
 			 */
 			public static function mapIndexed($mapper = null, $x = null){
-				return static::_curry2(function($mapper, $x){
+				return static::curryN(2, function($mapper, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -1903,7 +1933,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1915,7 +1945,7 @@
 			 * @return Closure
 			 */
 			public static function mapAccum($f = null, $acc = null, $arr = null){
-				return static::_curry3(function($f, $acc, $arr){
+				return static::curryN(3, function($f, $acc, $arr){
 					$index = 0;
 					$length = count($arr);
 					$tuple = $acc;
@@ -1928,7 +1958,7 @@
 					}
 
 					return [$tuple[0], $result];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1940,7 +1970,7 @@
 			 * @return Closure
 			 */
 			public static function mapAccumRight($f = null, $acc = null, $arr = null){
-				return static::_curry3(function($f, $acc, $arr){
+				return static::curryN(3, function($f, $acc, $arr){
 					$index = count($arr) - 1;
 					$result = [];
 					$tuple = [$acc];
@@ -1952,7 +1982,7 @@
 					}
 
 					return [$tuple[0], static::reverse($result)];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1962,7 +1992,7 @@
 			 * @return Closure
 			 */
 			public static function mergeAll($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$result = [];
 
 					foreach($arr as $obj){
@@ -1970,7 +2000,7 @@
 					}
 
 					return (object)$result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -1982,7 +2012,7 @@
 			 * @return Closure
 			 */
 			public static function move($from = null, $to = null, $arr = null){
-				return static::_curry3(function($from, $to, $arr){
+				return static::curryN(3, function($from, $to, $arr){
 					/** @var array $result */
 					$result = static::arrayClone($arr);
 					$length = count($result);
@@ -1996,7 +2026,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2008,12 +2038,12 @@
 			 * @return Closure
 			 */
 			public static function moveLeft($index = null, $count = null, $arr = null){
-				return static::_curry3(function($index, $count, $arr){
+				return static::curryN(3, function($index, $count, $arr){
 					$toInd = $index - $count;
 					$newIndex = ($toInd < 0) ? 0 : $toInd;
 
 					return static::move($index, $newIndex, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2025,13 +2055,13 @@
 			 * @return Closure
 			 */
 			public static function moveRight($index = null, $count = null, $arr = null){
-				return static::_curry3(function($index, $count, $arr){
+				return static::curryN(3, function($index, $count, $arr){
 					$max = count($arr) - 1;
 					$toInd = $index + $count;
 					$newIndex = ($toInd > $max) ? $max : $toInd;
 
 					return static::move($index, $newIndex, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2042,7 +2072,7 @@
 			 * @return Closure
 			 */
 			public static function none($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					foreach($arr as $item){
 						if($pred($item) === true){
 							return false;
@@ -2050,7 +2080,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2060,9 +2090,9 @@
 			 * @return Closure
 			 */
 			public static function notAllUnique($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return !static::allUnique($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2073,7 +2103,7 @@
 			 * @return Closure
 			 */
 			public static function nth($index = null, $x = null){
-				return static::_curry2(function($index, $x){
+				return static::curryN(2, function($index, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2086,7 +2116,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2097,7 +2127,7 @@
 			 * @return Closure
 			 */
 			public static function omitIndexes($indexes = null, $arr = null){
-				return static::_curry2(function($indexes, $arr){
+				return static::curryN(2, function($indexes, $arr){
 					/** @var array $newArr */
 					$newArr = static::arrayClone($arr);
 					$arrLength = count($arr);
@@ -2108,7 +2138,7 @@
 					}
 
 					return array_values($newArr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2119,9 +2149,9 @@
 			 * @return Closure
 			 */
 			public static function pair($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return [$x, $y];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2132,7 +2162,7 @@
 			 * @return Closure
 			 */
 			public static function partition($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -2167,7 +2197,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2178,7 +2208,7 @@
 			 * @return Closure
 			 */
 			public static function pickIndexes($indexes = null, $arr = null){
-				return static::_curry2(function($indexes, $arr){
+				return static::curryN(2, function($indexes, $arr){
 					$results = [];
 					$arrLen = count($arr);
 
@@ -2188,7 +2218,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2199,9 +2229,9 @@
 			 * @return Closure
 			 */
 			public static function pluck($key = null, $x = null){
-				return static::_curry2(function($key, $x){
+				return static::curryN(2, function($key, $x){
 					return static::map(static::prop($key), $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2212,12 +2242,12 @@
 			 * @return Closure
 			 */
 			public static function prepend($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					/**@var array $copy */
 					$copy = static::arrayClone($arr);
 					array_unshift($copy, $x);
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2228,7 +2258,7 @@
 			 * @return Closure
 			 */
 			public static function range($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$results = [];
 
 					for($n = $x; $n < $y; $n++){
@@ -2236,7 +2266,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2248,7 +2278,7 @@
 			 * @return Closure
 			 */
 			public static function reduce($reducer = null, $defaultVal = null, $x = null){
-				return static::_curry3(function($reducer, $defaultVal, $x){
+				return static::curryN(3, function($reducer, $defaultVal, $x){
 					$type = static::type($x);
 
 					if($type === 'object' || $type === 'array' || $type === 'string'){
@@ -2263,7 +2293,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -2282,14 +2312,14 @@
 			 * @return Closure
 			 */
 			public static function reduceBy($valueFunc = null, $defaultVal = null, $keyFunc = null, $x = null){
-				return static::_curry4(function($valueFunc, $defaultVal, $keyFunc, $x){
+				return static::curryN(4, function($valueFunc, $defaultVal, $keyFunc, $x){
 					return static::reduce(function($acc, $val) use ($valueFunc, $defaultVal, $keyFunc){
 						$key = $keyFunc($val);
 						$acc->$key = $valueFunc(property_exists($acc, $key) ? $acc->$key : $defaultVal, $val);
 
 						return $acc;
 					}, new stdClass(), $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2301,7 +2331,7 @@
 			 * @return Closure
 			 */
 			public static function reduceRight($reducer = null, $defaultVal = null, $x = null){
-				return static::_curry3(function($reducer, $defaultVal, $x){
+				return static::curryN(3, function($reducer, $defaultVal, $x){
 					$type = static::type($x);
 					$reducee = null;
 
@@ -2314,7 +2344,7 @@
 					}
 
 					return static::reduce($reducer, $defaultVal, $reducee);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2327,7 +2357,7 @@
 			 * @return Closure
 			 */
 			public static function reduceWhile($pred = null, $reducer = null, $defaultVal = null, $x = null){
-				return static::_curry4(function($pred, $reducer, $defaultVal, $x){
+				return static::curryN(4, function($pred, $reducer, $defaultVal, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -2358,7 +2388,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2369,10 +2399,10 @@
 			 * @return Closure
 			 */
 			public static function reject($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$newPred = static::pipe($pred, static::not());
 					return static::filter($newPred, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2382,9 +2412,9 @@
 			 * @return Closure
 			 */
 			public static function reindex($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return array_values($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2395,11 +2425,11 @@
 			 * @return Closure
 			 */
 			public static function rejectEq($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return static::filter(function($z) use ($x){
 						return $z !== $x;
 					}, $y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2409,11 +2439,11 @@
 			 * @return Closure
 			 */
 			public static function rejectNil($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return static::filter(function($y) use ($x){
 						return !static::isNil($y);
 					}, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2425,7 +2455,7 @@
 			 * @return Closure
 			 */
 			public static function remove($start = null, $count = null, $x = null){
-				return static::_curry3(function($start, $count, $x){
+				return static::curryN(3, function($start, $count, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2444,7 +2474,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2455,9 +2485,9 @@
 			 * @return Closure
 			 */
 			public static function repeat($val = null, $count = null){
-				return static::_curry2(function($val, $count){
+				return static::curryN(2, function($val, $count){
 					return array_fill(0, $count, $val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2467,10 +2497,10 @@
 			 * @return Closure
 			 */
 			public static function reverse($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$p = static::pipe(static::arrayClone(), 'array_reverse');
 					return $p($arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2482,7 +2512,7 @@
 			 * @return Closure
 			 */
 			public static function scan($reducer = null, $defaultVal = null, $arr = null){
-				return static::_curry3(function($reducer, $defaultVal, $arr){
+				return static::curryN(3, function($reducer, $defaultVal, $arr){
 					$index = 0;
 					$length = count($arr);
 					$result = [$defaultVal];
@@ -2494,7 +2524,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -2512,7 +2542,7 @@
 			 * @return Closure
 			 */
 			public static function slice($from = null, $to = null, $x = null){
-				return static::_curry3(function($from, $to, $x){
+				return static::curryN(3, function($from, $to, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2524,7 +2554,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2535,12 +2565,12 @@
 			 * @return Closure
 			 */
 			public static function sort($sorter = null, $arr = null){
-				return static::_curry2(function($sorter, $arr){
+				return static::curryN(2, function($sorter, $arr){
 					/**@var array $y */
 					$y = static::arrayClone($arr);
 					usort($y, $sorter);
 					return $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2550,7 +2580,7 @@
 			 * @return Closure
 			 */
 			public static function sortNumAsc($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return static::sort(function($a, $b){
 						if($a == $b){
 							return 0;
@@ -2558,7 +2588,7 @@
 
 						return ($a < $b) ? -1 : 1;
 					}, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2568,7 +2598,7 @@
 			 * @return Closure
 			 */
 			public static function sortNumDes($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return static::sort(function($a, $b){
 						if($a == $b){
 							return 0;
@@ -2576,7 +2606,7 @@
 
 						return ($a < $b) ? 1 : -1;
 					}, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2587,7 +2617,7 @@
 			 * @return Closure
 			 */
 			public static function splitAt($index = null, $x = null){
-				return static::_curry2(function($index, $x){
+				return static::curryN(2, function($index, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2603,7 +2633,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2614,7 +2644,7 @@
 			 * @return Closure
 			 */
 			public static function splitEvery($length = null, $x = null){
-				return static::_curry2(function($length, $x){
+				return static::curryN(2, function($length, $x){
 					$type = static::type($x);
 
 					if($type !== 'array' && $type !== 'string'){
@@ -2639,7 +2669,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2650,7 +2680,7 @@
 			 * @return Closure
 			 */
 			public static function splitWhen($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 					/**@var array $arr */
 					$arr = $x;
@@ -2668,7 +2698,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2679,7 +2709,7 @@
 			 * @return Closure
 			 */
 			public static function startsWith($prefix = null, $x = null){
-				return static::_curry2(function($prefix, $x){
+				return static::curryN(2, function($prefix, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2692,7 +2722,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2702,7 +2732,7 @@
 			 * @return Closure
 			 */
 			public static function tail($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2713,7 +2743,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2724,7 +2754,7 @@
 			 * @return Closure
 			 */
 			public static function take($count = null, $x = null){
-				return static::_curry2(function($count, $x){
+				return static::curryN(2, function($count, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2735,7 +2765,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2746,7 +2776,7 @@
 			 * @return Closure
 			 */
 			public static function takeLast($count = null, $x = null){
-				return static::_curry2(function($count, $x){
+				return static::curryN(2, function($count, $x){
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2757,7 +2787,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2768,7 +2798,7 @@
 			 * @return Closure
 			 */
 			public static function takeLastWhile($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 					/**@var array $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
@@ -2790,7 +2820,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2801,7 +2831,7 @@
 			 * @return Closure
 			 */
 			public static function takeWhile($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 					/** @var array|string $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
@@ -2822,7 +2852,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2833,7 +2863,7 @@
 			 * @return Closure
 			 */
 			public static function times($f = null, $count = null){
-				return static::_curry2(function($f, $count){
+				return static::curryN(2, function($f, $count){
 					$result = [];
 
 					for($n = 0; $n < $count; $n++){
@@ -2841,7 +2871,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -2857,7 +2887,7 @@
 			 * @return Closure
 			 */
 			public static function transpose($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					$i = 0;
 					$result = [];
 
@@ -2878,7 +2908,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -2895,7 +2925,7 @@
 			 * @return Closure
 			 */
 			public static function unfold($f = null, $seed = null){
-				return static::_curry2(function($f, $seed){
+				return static::curryN(2, function($f, $seed){
 					$pair = $f($seed);
 					$result = [];
 
@@ -2905,7 +2935,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2915,9 +2945,9 @@
 			 * @return Closure
 			 */
 			public static function uniq($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return array_values(array_unique($arr));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2928,9 +2958,9 @@
 			 * @return Closure
 			 */
 			public static function uniqAppend($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					return static::uniq(static::append($x, $arr));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2941,7 +2971,7 @@
 			 * @return Closure
 			 */
 			public static function uniqBy($f = null, $arr = null){
-				return static::_curry2(function($f, $arr){
+				return static::curryN(2, function($f, $arr){
 					$set = [];
 					$result = [];
 
@@ -2955,7 +2985,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2966,9 +2996,9 @@
 			 * @return Closure
 			 */
 			public static function uniqPrepend($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					return static::uniq(static::prepend($x, $arr));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -2979,7 +3009,7 @@
 			 * @return Closure
 			 */
 			public static function uniqWith($pred = null, $arr = null){
-				return static::_curry2(function($pred, $arr){
+				return static::curryN(2, function($pred, $arr){
 					$result = [];
 
 					foreach($arr as $val){
@@ -2998,7 +3028,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3008,9 +3038,9 @@
 			 * @return Closure
 			 */
 			public static function unnest($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return static::chain(static::identity(), $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3022,12 +3052,12 @@
 			 * @return Closure
 			 */
 			public static function update($index = null, $val = null, $arr = null){
-				return static::_curry3(function($index, $val, $arr){
+				return static::curryN(3, function($index, $val, $arr){
 					$copy = static::arrayClone($arr);
 					$copy[$index] = $val;
 
 					return $copy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3038,7 +3068,7 @@
 			 * @return Closure
 			 */
 			public static function without($values = null, $arr = null){
-				return static::_curry2(function($values, $arr){
+				return static::curryN(2, function($values, $arr){
 					$results = [];
 
 					foreach($arr as $item){
@@ -3048,7 +3078,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3059,7 +3089,7 @@
 			 * @return Closure
 			 */
 			public static function xPairs($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					$results = [];
 
 					foreach($arr as $val){
@@ -3067,7 +3097,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3078,7 +3108,7 @@
 			 * @return Closure
 			 */
 			public static function xPairsRight($x = null, $arr = null){
-				return static::_curry2(function($x, $arr){
+				return static::curryN(2, function($x, $arr){
 					$results = [];
 
 					foreach($arr as $val){
@@ -3086,7 +3116,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3097,7 +3127,7 @@
 			 * @return Closure
 			 */
 			public static function xprod($arr1 = null, $arr2 = null){
-				return static::_curry2(function($arr1, $arr2){
+				return static::curryN(2, function($arr1, $arr2){
 					$idx = 0;
 					$iLen = count($arr1);
 					$j = null;
@@ -3116,7 +3146,7 @@
 					}
 
 					return $result;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3127,7 +3157,7 @@
 			 * @return Closure
 			 */
 			public static function zip($arr1 = null, $arr2 = null){
-				return static::_curry2(function($arr1, $arr2){
+				return static::curryN(2, function($arr1, $arr2){
 					$rv = [];
 					$idx = 0;
 					$len = min(count($arr1), count($arr2));
@@ -3138,7 +3168,7 @@
 					}
 
 					return $rv;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3149,10 +3179,10 @@
 			 * @return Closure
 			 */
 			public static function zipObj($arr1 = null, $arr2 = null){
-				return static::_curry2(function($arr1, $arr2){
+				return static::curryN(2, function($arr1, $arr2){
 					$p = static::pipe(static::zip($arr2), static::fromPairs());
 					return $p($arr1);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3164,7 +3194,7 @@
 			 * @return Closure
 			 */
 			public static function zipWith($f = null, $arr1 = null, $arr2 = null){
-				return static::_curry3(function($f, $arr1, $arr2){
+				return static::curryN(3, function($f, $arr1, $arr2){
 					$rv = [];
 					$idx = 0;
 					$len = min(count($arr1), count($arr2));
@@ -3175,7 +3205,7 @@
 					}
 
 					return $rv;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -3188,11 +3218,11 @@
 			 * @return Closure
 			 */
 			public static function dumpVal($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return static::tap(function($x){
 						var_dump($x);
 					}, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3201,11 +3231,11 @@
 			 * @return Closure
 			 */
 			public static function echoVal($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return static::tap(function($x){
 						echo $x;
 					}, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3214,11 +3244,11 @@
 			 * @return Closure
 			 */
 			public static function printVal($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return static::tap(function($x){
 						print_r($x);
 					}, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -3233,7 +3263,7 @@
 			 * @return Closure
 			 */
 			public static function allPass($preds = null, $x = null){
-				return static::_curry2(function($preds, $x){
+				return static::curryN(2, function($preds, $x){
 					foreach($preds as $pred){
 						if($pred($x) === false){
 							return false;
@@ -3241,7 +3271,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3252,9 +3282,9 @@
 			 * @return Closure
 			 */
 			public static function andTrue($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y == true && $x == true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3265,7 +3295,7 @@
 			 * @return Closure
 			 */
 			public static function anyPass($preds = null, $x = null){
-				return static::_curry2(function($preds, $x){
+				return static::curryN(2, function($preds, $x){
 					foreach($preds as $pred){
 						if($pred($x) === true){
 							return true;
@@ -3273,7 +3303,7 @@
 					}
 
 					return false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3285,9 +3315,9 @@
 			 * @return Closure
 			 */
 			public static function both($pred1 = null, $pred2 = null, $x = null){
-				return static::_curry3(function($pred1, $pred2, $x){
+				return static::curryN(3, function($pred1, $pred2, $x){
 					return $pred1($x) && $pred2($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3298,9 +3328,9 @@
 			 * @return Closure
 			 */
 			public static function complement($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					return !$pred($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3325,9 +3355,9 @@
 			 * @return Closure
 			 */
 			public static function defaultTo($val = null, $x = null){
-				return static::_curry2(function($val, $x){
+				return static::curryN(2, function($val, $x){
 					return isset($x) ? $x : $val;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3337,9 +3367,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToEmptyArray($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : [];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3349,9 +3379,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToEmptyObject($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : new stdClass();
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3361,9 +3391,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToEmptyString($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : '';
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3373,9 +3403,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToFalse($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3385,9 +3415,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToOne($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : 1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3397,9 +3427,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToTrue($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3409,9 +3439,9 @@
 			 * @return Closure
 			 */
 			public static function defaultToZero($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return isset($x) ? $x : 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3423,9 +3453,9 @@
 			 * @return Closure
 			 */
 			public static function defaultWhen($pred = null, $x = null, $y = null){
-				return static::_curry3(function($pred, $x, $y){
+				return static::curryN(3, function($pred, $x, $y){
 					return $pred($y) === true ? $x : $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3437,9 +3467,9 @@
 			 * @return Closure
 			 */
 			public static function either($pred1 = null, $pred2 = null, $x = null){
-				return static::_curry3(function($pred1, $pred2, $x){
+				return static::curryN(3, function($pred1, $pred2, $x){
 					return $pred1($x) || $pred2($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3452,9 +3482,9 @@
 			 * @return Closure
 			 */
 			public static function ifElse($pred = null, $ifTrue = null, $ifFalse = null, $x = null){
-				return static::_curry4(function($pred, $ifTrue, $ifFalse, $x){
+				return static::curryN(4, function($pred, $ifTrue, $ifFalse, $x){
 					return ($pred($x) === true) ? $ifTrue($x) : $ifFalse($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3464,9 +3494,9 @@
 			 * @return Closure
 			 */
 			public static function isEmpty($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return empty($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3476,9 +3506,9 @@
 			 * @return Closure
 			 */
 			public static function isFalsy($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return !(boolean)$x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3488,9 +3518,9 @@
 			 * @return Closure
 			 */
 			public static function isTruthy($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return (boolean)$x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3502,9 +3532,9 @@
 			 * @return Closure
 			 */
 			public static function neither($pred1 = null, $pred2 = null, $x = null){
-				return static::_curry3(function($pred1, $pred2, $x){
+				return static::curryN(3, function($pred1, $pred2, $x){
 					return !($pred1($x) || $pred2($x));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3515,7 +3545,7 @@
 			 * @return Closure
 			 */
 			public static function nonePass($preds = null, $x = null){
-				return static::_curry2(function($preds, $x){
+				return static::curryN(2, function($preds, $x){
 					foreach($preds as $f){
 						if($f($x) === true){
 							return false;
@@ -3523,7 +3553,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3535,9 +3565,9 @@
 			 * @return Closure
 			 */
 			public static function nor($pred1 = null, $pred2 = null, $x = null){
-				return static::_curry3(function($pred1, $pred2, $x){
+				return static::curryN(3, function($pred1, $pred2, $x){
 					return $pred1($x) === false && $pred2($x) === false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3547,9 +3577,9 @@
 			 * @return Closure
 			 */
 			public static function not($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return !$x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3560,9 +3590,9 @@
 			 * @return Closure
 			 */
 			public static function notEqual($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $x !== $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3573,9 +3603,9 @@
 			 * @return Closure
 			 */
 			public static function orEither($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $x || $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3587,11 +3617,11 @@
 			 * @return Closure
 			 */
 			public static function pathSatisfies($pred = null, $keys = null, $x = null){
-				return static::_curry3(function($pred, $keys, $x){
+				return static::curryN(3, function($pred, $keys, $x){
 					$ifElse = static::ifElse($pred, static::always(true), static::always(false));
 					$p = static::pipe(static::path($keys), $ifElse);
 					return $p($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3603,9 +3633,9 @@
 			 * @return Closure
 			 */
 			public static function propSatisfies($pred = null, $key = null, $x = null){
-				return static::_curry3(function($pred, $key, $x){
+				return static::curryN(3, function($pred, $key, $x){
 					return $pred(static::prop($key, $x)) ? true : false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3617,9 +3647,9 @@
 			 * @return Closure
 			 */
 			public static function unless($pred = null, $ifFalse = null, $x = null){
-				return static::_curry3(function($pred, $ifFalse, $x){
+				return static::curryN(3, function($pred, $ifFalse, $x){
 					return $pred($x) ? $x : $ifFalse($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3631,7 +3661,7 @@
 			 * @return Closure
 			 */
 			public static function until($pred = null, $do = null, $x = null){
-				return static::_curry3(function($pred, $do, $x){
+				return static::curryN(3, function($pred, $do, $x){
 					$val = $x;
 
 					while(!$pred($val)){
@@ -3639,7 +3669,7 @@
 					}
 
 					return $val;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3651,9 +3681,9 @@
 			 * @return Closure
 			 */
 			public static function when($pred = null, $ifTrue = null, $x = null){
-				return static::_curry3(function($pred, $ifTrue, $x){
+				return static::curryN(3, function($pred, $ifTrue, $x){
 					return $pred($x) ? $ifTrue($x) : $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3664,9 +3694,9 @@
 			 * @return Closure
 			 */
 			public static function xorOp($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return (bool)($x xor $y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -3680,9 +3710,9 @@
 			 * @return Closure
 			 */
 			public static function ceil($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return ceil($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3693,9 +3723,9 @@
 			 * @return Closure
 			 */
 			public static function add($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $x + $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3705,9 +3735,9 @@
 			 * @return Closure
 			 */
 			public static function dec($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x - 1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3718,9 +3748,9 @@
 			 * @return Closure
 			 */
 			public static function divide($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y / $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3730,9 +3760,9 @@
 			 * @return Closure
 			 */
 			public static function floor($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return floor($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3742,9 +3772,9 @@
 			 * @return Closure
 			 */
 			public static function inc($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x + 1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3754,10 +3784,10 @@
 			 * @return Closure
 			 */
 			public static function mean($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$p = static::pipe(static::sum(), static::divide(count($x)));
 					return $p($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3767,7 +3797,7 @@
 			 * @return Closure
 			 */
 			public static function median($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$p = static::pipe(static::arrayClone(), static::sortNumAsc());
 					$y = $p($x);
 					$len = count($y);
@@ -3781,7 +3811,7 @@
 					$z = array_slice($y, $idx, $width);
 
 					return static::mean($z);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3792,9 +3822,9 @@
 			 * @return Closure
 			 */
 			public static function modulo($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y % $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3805,9 +3835,9 @@
 			 * @return Closure
 			 */
 			public static function multiply($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $x * $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3817,9 +3847,9 @@
 			 * @return Closure
 			 */
 			public static function negate($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x * -1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3830,9 +3860,9 @@
 			 * @return Closure
 			 */
 			public static function pow($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return pow($y, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3842,11 +3872,11 @@
 			 * @return Closure
 			 */
 			public static function product($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return R::reduce(function($acc, $num){
 						return $acc * $num;
 					}, 1, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3856,9 +3886,9 @@
 			 * @return Closure
 			 */
 			public static function round($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return round($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3868,7 +3898,7 @@
 			 * @return Closure
 			 */
 			public static function sign($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					if($x < 0){
 						return -1;
 					}
@@ -3877,7 +3907,7 @@
 					}
 
 					return 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3888,9 +3918,9 @@
 			 * @return Closure
 			 */
 			public static function subtract($x = null, $y = null){
-				return static::_curry2(function($x, $y){
-					return $y - $x;
-				}, func_get_args());
+				return static::curryN(2, function($x, $y){
+					return $x - $y;
+				})(...func_get_args());
 			}
 
 			/**
@@ -3900,11 +3930,11 @@
 			 * @return Closure
 			 */
 			public static function sum($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return R::reduce(function($acc, $num){
 						return $acc + $num;
 					}, 0, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3914,9 +3944,9 @@
 			 * @return Closure
 			 */
 			public static function trunc($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return (int)floor($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -3932,7 +3962,7 @@
 			 * @return Closure
 			 */
 			public static function assoc($key = null, $val = null, $x = null){
-				return static::_curry3(function($key, $val, $x){
+				return static::curryN(3, function($key, $val, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -3947,7 +3977,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3959,7 +3989,7 @@
 			 * @return Closure
 			 */
 			public static function assocPath($keys = null, $val = null, $x = null){
-				return static::_curry3(function($keys, $val, $x){
+				return static::curryN(3, function($keys, $val, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -3986,7 +4016,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -3997,7 +4027,7 @@
 			 * @return Closure
 			 */
 			public static function dissoc($key = null, $x = null){
-				return static::_curry2(function($key, $x){
+				return static::curryN(2, function($key, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -4013,7 +4043,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4024,7 +4054,7 @@
 			 * @return Closure
 			 */
 			public static function dissocPath($keys = null, $x = null){
-				return static::_curry2(function($keys, $x){
+				return static::curryN(2, function($keys, $x){
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -4062,7 +4092,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4072,9 +4102,9 @@
 			 * @return Closure
 			 */
 			public static function deepClone($x){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return unserialize(serialize($x));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4086,7 +4116,7 @@
 			 * @return Closure
 			 */
 			public static function eqProps($key = null, $x = null, $y = null){
-				return static::_curry3(function($key, $x, $y){
+				return static::curryN(3, function($key, $x, $y){
 					$type1 = static::type($x);
 					$type2 = static::type($y);
 
@@ -4098,7 +4128,7 @@
 					}
 
 					return false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4115,13 +4145,13 @@
 			 * @return Closure
 			 */
 			public static function forEachObjIndexed($f = null, $x = null){
-				return static::_curry2(function($f, $x){
+				return static::curryN(2, function($f, $x){
 					foreach($x as $key => $value){
 						$f($value, $key, $x);
 					}
 
 					return $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4132,7 +4162,7 @@
 			 * @return Closure
 			 */
 			public static function has($key = null, $x = null){
-				return static::_curry2(function($key, $x){
+				return static::curryN(2, function($key, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4143,7 +4173,7 @@
 					}
 
 					return false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4160,7 +4190,7 @@
 			 * @return Closure
 			 */
 			public static function hasPath($path = null, $x = null){
-				return static::_curry2(function($path, $x){
+				return static::curryN(2, function($path, $x){
 					$type = static::type($x);
 					$subObject = null;
 					$counter = 0;
@@ -4194,7 +4224,7 @@
 					}
 
 					return ($counter === count($path));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4204,7 +4234,7 @@
 			 * @return Closure
 			 */
 			public static function invert($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					/** @var array|object $props */
 					$props = static::keys($x);
 					$type = static::type($x);
@@ -4236,7 +4266,7 @@
 					}
 
 					return $out;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4246,7 +4276,7 @@
 			 * @return Closure
 			 */
 			public static function invertObj($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					/** @var array $props */
 					$props = static::keys($x);
 					$type = static::type($x);
@@ -4279,7 +4309,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4288,7 +4318,7 @@
 			 * @return Closure
 			 */
 			public static function keys($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4299,7 +4329,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4346,7 +4376,7 @@
 			 * @return Closure
 			 */
 			public static function mapObjIndexed($mapper = null, $x = null){
-				return static::_curry2(function($mapper, $x){
+				return static::curryN(2, function($mapper, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4369,7 +4399,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4380,7 +4410,7 @@
 			 * @return Closure
 			 */
 			public static function merge($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$type1 = static::type($x);
 					$type2 = static::type($y);
 
@@ -4392,7 +4422,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4427,7 +4457,7 @@
 			 * @return Closure
 			 */
 			public static function mergeLeft($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$type1 = static::type($x);
 					$type2 = static::type($y);
 
@@ -4439,7 +4469,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4450,9 +4480,9 @@
 			 * @return Closure
 			 */
 			public static function mergeRight($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return static::merge($x, $y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4464,11 +4494,11 @@
 			 * @return Closure
 			 */
 			public static function mergeWith($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					return static::mergeWithKey(function($_, $_l, $_r) use ($f){
 						return $f($_, $_l, $_r);
 					}, $x, $y);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4480,7 +4510,7 @@
 			 * @return Closure
 			 */
 			public static function mergeWithKey($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					$type1 = static::type($x);
 					$type2 = static::type($y);
 
@@ -4520,7 +4550,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4531,11 +4561,11 @@
 			 * @return Closure
 			 */
 			public static function objOf($key = null, $val = null){
-				return static::_curry2(function($key, $val){
+				return static::curryN(2, function($key, $val){
 					$obj = new stdClass();
 					$obj->$key = $val;
 					return $obj;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4546,7 +4576,7 @@
 			 * @return Closure
 			 */
 			public static function omit($keys = null, $x = null){
-				return static::_curry2(function($keys, $x){
+				return static::curryN(2, function($keys, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4570,7 +4600,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4581,7 +4611,7 @@
 			 * @return Closure
 			 */
 			public static function omitBy($f = null, $x = null){
-				return static::_curry2(function($f, $x){
+				return static::curryN(2, function($f, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4611,7 +4641,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4628,7 +4658,7 @@
 			 * @return Closure
 			 */
 			public static function path($path = null, $x = null){
-				return static::_curry2(function($path, $x){
+				return static::curryN(2, function($path, $x){
 					$current = &$x;
 
 					foreach($path as $key){
@@ -4636,7 +4666,7 @@
 					}
 
 					return $current;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4647,7 +4677,7 @@
 			 * @return Closure
 			 */
 			public static function paths($paths = null, $x = null){
-				return static::_curry2(function($paths, $x){
+				return static::curryN(2, function($paths, $x){
 					$results = [];
 
 					foreach($paths as $path){
@@ -4655,7 +4685,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4667,9 +4697,9 @@
 			 * @return Closure
 			 */
 			public static function pathOr($val = null, $path = null, $x = null){
-				return static::_curry3(function($val, $path, $x){
+				return static::curryN(3, function($val, $path, $x){
 					return static::defaultTo($val, static::path($path, $x));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4680,7 +4710,7 @@
 			 * @return Closure
 			 */
 			public static function pick($keys = null, $x = null){
-				return static::_curry2(function($keys, $x){
+				return static::curryN(2, function($keys, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4707,7 +4737,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4719,7 +4749,7 @@
 			 * @return Closure
 			 */
 			public static function pickAll($keys = null, $defaultVal = null, $x = null){
-				return static::_curry3(function($keys, $defaultVal, $x){
+				return static::curryN(3, function($keys, $defaultVal, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4742,7 +4772,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4753,7 +4783,7 @@
 			 * @return Closure
 			 */
 			public static function pickBy($pred = null, $x = null){
-				return static::_curry2(function($pred, $x){
+				return static::curryN(2, function($pred, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4782,7 +4812,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4793,7 +4823,7 @@
 			 * @return Closure
 			 */
 			public static function project($props = null, $x = null){
-				return static::_curry2(function($props, $x){
+				return static::curryN(2, function($props, $x){
 					$type = static::type($x);
 
 					if($type !== 'array'){
@@ -4831,7 +4861,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4842,7 +4872,7 @@
 			 * @return Closure
 			 */
 			public static function prop($key = null, $x = null){
-				return static::_curry2(function($key, $x){
+				return static::curryN(2, function($key, $x){
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4853,7 +4883,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4865,13 +4895,13 @@
 			 * @return Closure
 			 */
 			public static function propOr($val = null, $key = null, $x = null){
-				return static::_curry3(function($val, $key, $x){
+				return static::curryN(3, function($val, $key, $x){
 					$c = static::cond(
 						[static::has($key), static::prop($key)],
 						[static::always(true), static::always($val)]
 					);
 					return $c($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4882,11 +4912,11 @@
 			 * @return Closure
 			 */
 			public static function props($keys = null, $x = null){
-				return static::_curry2(function($keys, $x){
+				return static::curryN(2, function($keys, $x){
 					return static::map(function($key) use ($x){
 						return static::prop($key, $x);
 					}, $keys);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4902,7 +4932,7 @@
 			 * @return Closure
 			 */
 			public static function toPairs($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 					$keys = static::keys($x);
 					$results = [];
@@ -4919,7 +4949,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -4929,7 +4959,7 @@
 			 * @return Closure
 			 */
 			public static function toEntries($obj = null){
-				return static::_curry1(function($obj){
+				return static::curryN(1, function($obj){
 					$results = [];
 
 					foreach($obj as $key => $value){
@@ -4939,7 +4969,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4955,7 +4985,7 @@
 			 * @return Closure
 			 */
 			public static function values($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 					$keys = static::keys($x);
 					$results = [];
@@ -4972,7 +5002,7 @@
 					}
 
 					return null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -4995,7 +5025,7 @@
 			 * @return Closure
 			 */
 			public static function where($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$type = static::type($x);
 					$keys = static::keys($x);
 
@@ -5023,7 +5053,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5034,7 +5064,7 @@
 			 * @return Closure
 			 */
 			public static function whereEq($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$type = static::type($x);
 					$keys = static::keys($x);
 
@@ -5054,7 +5084,7 @@
 					}
 
 					return true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -5070,9 +5100,9 @@
 			 * @return Closure
 			 */
 			public static function clamp($min = null, $max = null, $x = null){
-				return static::_curry3(function($min, $max, $x){
+				return static::curryN(3, function($min, $max, $x){
 					return max($min, min($max, $x));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5083,11 +5113,11 @@
 			 * @return Closure
 			 */
 			public static function countBy($f = null, $arr = null){
-				return static::_curry2(function($f, $arr){
+				return static::curryN(2, function($f, $arr){
 					return static::reduceBy(function($acc){
 						return $acc + 1;
 					}, 0, $f, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5098,7 +5128,7 @@
 			 * @return Closure
 			 */
 			public static function difference($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$out = [];
 					$idx = 0;
 					$xLen = count($x);
@@ -5120,7 +5150,7 @@
 					}
 
 					return $out;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5132,7 +5162,7 @@
 			 * @return Closure
 			 */
 			public static function differenceWith($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					$results = [];
 					$idx = 0;
 					$firstLen = count($x);
@@ -5147,7 +5177,7 @@
 					}
 
 					return $results;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5159,9 +5189,9 @@
 			 * @return Closure
 			 */
 			public static function eqBy($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					return static::equals($f($x), $f($y));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5172,9 +5202,9 @@
 			 * @return Closure
 			 */
 			public static function equals($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $x === $y;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5184,9 +5214,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToEmptyArray($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === [];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5196,11 +5226,11 @@
 			 * @return Closure
 			 */
 			public static function equalsToEmptyObject($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					/** @var array $keys */
 					$keys = static::keys($x);
 					return count($keys) === 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5210,9 +5240,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToEmptyString($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === '';
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5222,9 +5252,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToFalse($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5234,9 +5264,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToNull($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5246,9 +5276,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToOne($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === 1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5258,9 +5288,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToTrue($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === true;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5270,9 +5300,9 @@
 			 * @return Closure
 			 */
 			public static function equalsToZero($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x === 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5283,9 +5313,9 @@
 			 * @return Closure
 			 */
 			public static function gt($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y > $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5296,9 +5326,9 @@
 			 * @return Closure
 			 */
 			public static function gte($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y >= $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/*
@@ -5316,11 +5346,11 @@
 			 * @return Closure
 			 */
 			public static function innerJoin($pred = null, $x = null, $y = null){
-				return static::_curry3(function($pred, $x, $y){
+				return static::curryN(3, function($pred, $x, $y){
 					return static::filter(function($x) use ($pred, $y){
 						return static::_includesWith($pred, $x, $y);
 					}, $x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5331,7 +5361,7 @@
 			 * @return Closure
 			 */
 			public static function intersection($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					$longArr = null;
 					$shortArr = null;
 
@@ -5355,7 +5385,7 @@
 					});
 
 					return static::uniq($results);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5365,9 +5395,9 @@
 			 * @return Closure
 			 */
 			public static function isEven($x){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x % 2 === 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5377,9 +5407,9 @@
 			 * @return Closure
 			 */
 			public static function isOdd($x){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x % 2 !== 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5390,9 +5420,9 @@
 			 * @return Closure
 			 */
 			public static function lt($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y < $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5403,9 +5433,9 @@
 			 * @return Closure
 			 */
 			public static function lte($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y <= $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5416,9 +5446,9 @@
 			 * @return Closure
 			 */
 			public static function max($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y > $x ? $y : $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5430,9 +5460,9 @@
 			 * @return Closure
 			 */
 			public static function maxBy($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					return $f($y) > $f($x) ? $y : $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5443,9 +5473,9 @@
 			 * @return Closure
 			 */
 			public static function min($x = null, $y = null){
-				return static::_curry2(function($x, $y){
+				return static::curryN(2, function($x, $y){
 					return $y < $x ? $y : $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5457,9 +5487,9 @@
 			 * @return Closure
 			 */
 			public static function minBy($f = null, $x = null, $y = null){
-				return static::_curry3(function($f, $x, $y){
+				return static::curryN(3, function($f, $x, $y){
 					return $f($y) < $f($x) ? $y : $x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5471,7 +5501,7 @@
 			 * @return Closure
 			 */
 			public static function pathEq($path = null, $val = null, $obj = null){
-				return static::_curry3(function($path, $val, $obj){
+				return static::curryN(3, function($path, $val, $obj){
 					$current = &$obj;
 
 					foreach($path as $key){
@@ -5479,7 +5509,7 @@
 					}
 
 					return $current === $val;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5491,7 +5521,7 @@
 			 * @return Closure
 			 */
 			public static function pathNotEq($path = null, $val = null, $obj = null){
-				return static::_curry3(function($path, $val, $obj){
+				return static::curryN(3, function($path, $val, $obj){
 					$current = &$obj;
 
 					foreach($path as $key){
@@ -5499,7 +5529,7 @@
 					}
 
 					return $current !== $val;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5511,10 +5541,10 @@
 			 * @return Closure
 			 */
 			public static function propEq($key = null, $val = null, $obj = null){
-				return static::_curry3(function($key, $val, $obj){
+				return static::curryN(3, function($key, $val, $obj){
 					$p = static::pipe(static::prop($key), static::equals($val));
 					return $p($obj);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5526,10 +5556,10 @@
 			 * @return Closure
 			 */
 			public static function propNotEq($key = null, $val = null, $obj = null){
-				return static::_curry3(function($key, $val, $obj){
+				return static::curryN(3, function($key, $val, $obj){
 					$p = static::pipe(static::prop($key), static::notEqual($val));
 					return $p($obj);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5540,7 +5570,7 @@
 			 * @return Closure
 			 */
 			public static function sortBy($f = null, $arr = null){
-				return static::_curry2(function($f, $arr){
+				return static::curryN(2, function($f, $arr){
 					return R::sort(function($a, $b) use ($f){
 						$aa = $f($a);
 						$bb = $f($b);
@@ -5551,7 +5581,7 @@
 
 						return ($aa < $bb) ? -1 : 1;
 					}, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5562,7 +5592,7 @@
 			 * @return Closure
 			 */
 			public static function sortWith($fArr = null, $arr = null){
-				return static::_curry2(function($fArr, $arr){
+				return static::curryN(2, function($fArr, $arr){
 					return R::sort(function($a, $b) use ($fArr){
 						$result = 0;
 						$i = 0;
@@ -5574,7 +5604,7 @@
 
 						return $result;
 					}, $arr);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5585,9 +5615,9 @@
 			 * @return Closure
 			 */
 			public static function symmetricDifference($arr1 = null, $arr2 = null){
-				return static::_curry2(function($arr1, $arr2){
+				return static::curryN(2, function($arr1, $arr2){
 					return static::concat(static::difference($arr1, $arr2), static::difference($arr2, $arr1));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5599,9 +5629,9 @@
 			 * @return Closure
 			 */
 			public static function symmetricDifferenceWith($pred = null, $arr1 = null, $arr2 = null){
-				return static::_curry3(function($pred, $arr1, $arr2){
+				return static::curryN(3, function($pred, $arr1, $arr2){
 					return static::concat(static::differenceWith($pred, $arr1, $arr2), static::differenceWith($pred, $arr2, $arr1));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5612,9 +5642,9 @@
 			 * @return Closure
 			 */
 			public static function union($arr1 = null, $arr2 = null){
-				return static::_curry2(function($arr1, $arr2){
+				return static::curryN(2, function($arr1, $arr2){
 					return static::uniq(array_merge($arr1, $arr2));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5626,9 +5656,9 @@
 			 * @return Closure
 			 */
 			public static function unionWith($pred = null, $arr1 = null, $arr2 = null){
-				return static::_curry3(function($pred, $arr1, $arr2){
+				return static::curryN(3, function($pred, $arr1, $arr2){
 					return static::uniqWith($pred, array_merge($arr1, $arr2));
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -5642,9 +5672,9 @@
 			 * @return Closure
 			 */
 			public static function capitalizeAll($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return ucwords($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5654,9 +5684,9 @@
 			 * @return Closure
 			 */
 			public static function capitalizeFirst($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return ucfirst($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5667,9 +5697,9 @@
 			 * @return Closure
 			 */
 			public static function endsWithSuffix($str = null, $in = null){
-				return static::_curry2(function($str, $in){
+				return static::curryN(2, function($str, $in){
 					return (static::takeLast(strlen($str), $in) === $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5680,10 +5710,10 @@
 			 * @return Closure
 			 */
 			public static function endsWithSuffixIgnoreCase($str = null, $in = null){
-				return static::_curry2(function($str, $in){
+				return static::curryN(2, function($str, $in){
 					$suffix = static::takeLast(strlen($str), $in);
 					return strtolower($suffix) === strtolower($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5694,9 +5724,9 @@
 			 * @return Closure
 			 */
 			public static function equalsStringIgnoreCase($str1 = null, $str2 = null){
-				return static::_curry2(function($str1, $str2){
+				return static::curryN(2, function($str1, $str2){
 					return strtolower($str1) === strtolower($str2);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5707,11 +5737,11 @@
 			 * @return Closure
 			 */
 			public static function match($regEx = null, $str = null){
-				return static::_curry2(function($regEx, $str){
+				return static::curryN(2, function($regEx, $str){
 					$results = [];
 					preg_match_all($regEx, $str, $results);
 					return $results[0];
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5724,10 +5754,10 @@
 			 * @return Closure
 			 */
 			public static function replace($find = null, $replaceWith = null, $str = null){
-				return static::_curry3(function($find, $replaceWith, $str){
+				return static::curryN(3, function($find, $replaceWith, $str){
 					$pos = strpos($str, $find);
 					return ($pos !== false) ? substr_replace($str, $replaceWith, $pos, strlen($find)) : $str;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5740,9 +5770,9 @@
 			 * @return Closure
 			 */
 			public static function replaceAll($find = null, $replaceWith = null, $str = null){
-				return static::_curry3(function($find, $replaceWith, $str){
+				return static::curryN(3, function($find, $replaceWith, $str){
 					return str_replace($find, $replaceWith, $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5754,9 +5784,9 @@
 			 * @return Closure
 			 */
 			public static function replaceRegEx($regEx = null, $replaceWith = null, $str = null){
-				return static::_curry3(function($regEx, $replaceWith, $str){
+				return static::curryN(3, function($regEx, $replaceWith, $str){
 					return preg_replace($regEx, $replaceWith, $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5768,7 +5798,7 @@
 			 * @return Closure
 			 */
 			public static function replaceTokenStrings($replaceWith = null, $str = null){
-				return static::_curry2(function($replaceWith, $str){
+				return static::curryN(2, function($replaceWith, $str){
 					$strCopy = $str;
 
 					for($n = 0; $n < count($replaceWith); $n++){
@@ -5776,7 +5806,7 @@
 					}
 
 					return $strCopy;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5787,9 +5817,9 @@
 			 * @return Closure
 			 */
 			public static function split($on = null, $str = null){
-				return static::_curry2(function($on, $str){
+				return static::curryN(2, function($on, $str){
 					return empty($on) ? str_split($str) : explode($on, $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5800,9 +5830,9 @@
 			 * @return Closure
 			 */
 			public static function startsWithPrefix($str = null, $in = null){
-				return static::_curry2(function($str, $in){
+				return static::curryN(2, function($str, $in){
 					return (static::take(strlen($str) - 1, $in) === $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5813,10 +5843,10 @@
 			 * @return Closure
 			 */
 			public static function startsWithPrefixIgnoreCase($str = null, $in = null){
-				return static::_curry2(function($str, $in){
+				return static::curryN(2, function($str, $in){
 					$prefix = static::take(strlen($str) - 1, $in);
 					return strtolower($prefix) === strtolower($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5827,9 +5857,9 @@
 			 * @return Closure
 			 */
 			public static function test($regEx = null, $str = null){
-				return static::_curry2(function($regEx, $str){
+				return static::curryN(2, function($regEx, $str){
 					return preg_match($regEx, $str) ? true : false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5839,12 +5869,12 @@
 			 * @return Closure
 			 */
 			public static function toCamelCase($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = ucwords(trim($str));
 					$str = str_replace(" ", "", $str);
 					return lcfirst($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5854,11 +5884,11 @@
 			 * @return Closure
 			 */
 			public static function toConstCase($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = strtoupper(trim($str));
 					return str_replace(" ", "_", $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5868,11 +5898,11 @@
 			 * @return Closure
 			 */
 			public static function toKebabCase($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = trim($str);
 					return str_replace(" ", "-", $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5882,9 +5912,9 @@
 			 * @return Closure
 			 */
 			public static function toLower($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return strtolower($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5894,11 +5924,11 @@
 			 * @return Closure
 			 */
 			public static function toPascalCase($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = ucwords(trim($str));
 					return str_replace(" ", "", $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5908,11 +5938,11 @@
 			 * @return Closure
 			 */
 			public static function toSnakeCase($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = trim($str);
 					return str_replace(" ", "_", $str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5922,7 +5952,7 @@
 			 * @return Closure
 			 */
 			public static function toString($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					$type = static::type($x);
 
 					if($type === 'object' || $type === 'array'){
@@ -5930,7 +5960,7 @@
 					}
 
 					return (string)$x;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5940,9 +5970,9 @@
 			 * @return Closure
 			 */
 			public static function toUpper($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return strtoupper($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5952,9 +5982,9 @@
 			 * @return Closure
 			 */
 			public static function toUpperFirst($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return ucfirst($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5964,9 +5994,9 @@
 			 * @return Closure
 			 */
 			public static function trim($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return trim($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5976,9 +6006,9 @@
 			 * @return Closure
 			 */
 			public static function trimEnd($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return rtrim($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -5988,9 +6018,9 @@
 			 * @return Closure
 			 */
 			public static function trimStart($str = null){
-				return static::_curry1(function($str){
+				return static::curryN(1, function($str){
 					return ltrim($str);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6000,9 +6030,9 @@
 			 * @return Closure
 			 */
 			public static function wrapWith($arr = null, $str = null){
-				return static::_curry2(function($arr, $str){
+				return static::curryN(2, function($arr, $str){
 					return (count($arr) === 2) ? "{$arr[0]}{$str}{$arr[1]}" : "{$arr[0]}{$str}{$arr[0]}";
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
@@ -6018,13 +6048,13 @@
 			 * @return Closure
 			 */
 			public static function between($min = null, $max = null, $val = null){
-				return static::_curry3(function($min, $max, $val){
+				return static::curryN(3, function($min, $max, $val){
 					if($val >= $min && $val <= $max){
 						return true;
 					}
 
 					return false;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6034,9 +6064,9 @@
 			 * @return Closure
 			 */
 			public static function isBoolean($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return static::isType($val) === 'boolean';
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6046,9 +6076,9 @@
 			 * @return Closure
 			 */
 			public static function isArray($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return static::isType($val) === 'array';
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6057,9 +6087,9 @@
 			 * @return Closure
 			 */
 			public static function isFloat($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return is_float($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6069,9 +6099,9 @@
 			 * @return Closure
 			 */
 			public static function isFunction($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return is_callable($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6080,9 +6110,9 @@
 			 * @return Closure
 			 */
 			public static function isInt($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return is_int($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6092,9 +6122,9 @@
 			 * @return Closure
 			 */
 			public static function isNegative($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x < 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6104,9 +6134,9 @@
 			 * @return Closure
 			 */
 			public static function isNil($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return $val === null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6116,9 +6146,9 @@
 			 * @return Closure
 			 */
 			public static function isNilOrEmpty($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return ($val === null) || empty($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6128,9 +6158,9 @@
 			 * @return Closure
 			 */
 			public static function isNumber($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return is_numeric($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6140,9 +6170,9 @@
 			 * @return Closure
 			 */
 			public static function isObject($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return is_object($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6152,9 +6182,9 @@
 			 * @return Closure
 			 */
 			public static function isPair($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return is_array($x) && (count($x) === 2);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6164,9 +6194,9 @@
 			 * @return Closure
 			 */
 			public static function isPositive($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return $x >= 0;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6176,9 +6206,9 @@
 			 * @return Closure
 			 */
 			public static function isSparseArray($arr = null){
-				return static::_curry1(function($arr){
+				return static::curryN(1, function($arr){
 					return static::last(static::keys($arr)) > count($arr) - 1;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6188,9 +6218,9 @@
 			 * @return Closure
 			 */
 			public static function isString($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return is_string($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6201,10 +6231,10 @@
 			 * @return Closure
 			 */
 			public static function isType($type = null, $val = null){
-				return static::_curry2(function($type, $val){
+				return static::curryN(2, function($type, $val){
 					$p = static::pipe(static::type(), static::equals($type));
 					return $p($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6213,9 +6243,9 @@
 			 * @return Closure
 			 */
 			public static function isVarSet($val = null){
-				return static::_curry1(function($val){
+				return static::curryN(1, function($val){
 					return isset($val);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6227,10 +6257,10 @@
 			 * @return Closure
 			 */
 			public static function propIs($type = null, $key = null, $obj = null){
-				return static::_curry3(function($type, $key, $obj){
+				return static::curryN(3, function($type, $key, $obj){
 					$p = static::pipe(static::prop($key), static::isType($type));
 					return $p($obj);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6239,7 +6269,7 @@
 			 * @return Closure
 			 */
 			public static function toNumber($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					if(!is_numeric($x)){
 						return null;
 					}
@@ -6249,7 +6279,7 @@
 					else{
 						return intval($x);
 					}
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6260,7 +6290,7 @@
 			 * @return Closure
 			 */
 			public static function toType($type = null, $val = null){
-				return static::_curry2(function($type, $val){
+				return static::curryN(2, function($type, $val){
 					$copy = $val;
 					$valType = static::type($val);
 
@@ -6273,7 +6303,7 @@
 
 					$success = settype($copy, $type);
 					return $success === true ? $copy : null;
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			/**
@@ -6283,93 +6313,14 @@
 			 * @return Closure
 			 */
 			public static function type($x = null){
-				return static::_curry1(function($x){
+				return static::curryN(1, function($x){
 					return gettype($x);
-				}, func_get_args());
+				})(...func_get_args());
 			}
 
 			//</editor-fold>
 
 			//<editor-fold desc="__INTERNAL__">
-
-			private static function _getArity($function){
-				$reflection = null;
-
-				if(is_string($function) || $function instanceof Closure){
-					try{
-						$reflection = new ReflectionFunction($function);
-					}
-					catch(ReflectionException $e){
-					}
-				}
-				elseif(is_array($function)){
-					list($class, $name) = $function;
-					try{
-						$reflection = new ReflectionMethod($class, $name);
-					}
-					catch(ReflectionException $e){
-					}
-				}
-				else{
-					$reflectionObject = new ReflectionObject($function);
-					try{
-						$reflection = $reflectionObject->getMethod('__invoke');
-					}
-					catch(ReflectionException $e){
-					}
-				}
-
-				return $reflection->getNumberOfRequiredParameters();
-			}
-
-			private static function _curryN($length, $function, ...$initialArguments){
-				return count($initialArguments) >= $length && (static::$placeholder === null ||
-					!in_array(static::$placeholder, $initialArguments, true)) ?
-					$function(...$initialArguments) :
-					function(...$arguments) use ($length, $function, $initialArguments){
-						return static::_curryN($length, $function, ...static::_resolveArguments($arguments, $initialArguments));
-					};
-			}
-
-			private static function _curry1($original, $initialArguments){
-				return count($initialArguments) === 0 ? $original : $original(...$initialArguments);
-			}
-
-			private static function _curry2($original, $initialArguments){
-				return count($initialArguments) >= 2 && (static::$placeholder === null ||
-					!in_array(static::$placeholder, $initialArguments, true)) ?
-					$original(...$initialArguments) :
-					function(...$newArguments) use ($original, $initialArguments){
-						return static::_curry2($original, static::_resolveArguments($newArguments, $initialArguments));
-					};
-			}
-
-			private static function _curry3($original, $initialArguments){
-				return count($initialArguments) >= 3 && (static::$placeholder === null ||
-					!in_array(static::$placeholder, $initialArguments, true)) ?
-					$original(...$initialArguments) :
-					function(...$newArguments) use ($original, $initialArguments){
-						return static::_curry3($original, static::_resolveArguments($newArguments, $initialArguments));
-					};
-			}
-
-			private static function _curry4($original, $initialArguments){
-				return count($initialArguments) >= 4 && (static::$placeholder === null ||
-					!in_array(static::$placeholder, $initialArguments, true)) ?
-					$original(...$initialArguments) :
-					function(...$newArguments) use ($original, $initialArguments){
-						return static::_curry4($original, static::_resolveArguments($newArguments, $initialArguments));
-					};
-			}
-
-			private static function _curry5($original, $initialArguments){
-				return count($initialArguments) >= 5 && (static::$placeholder === null ||
-					!in_array(static::$placeholder, $initialArguments, true)) ?
-					$original(...$initialArguments) :
-					function(...$newArguments) use ($original, $initialArguments){
-						return static::_curry5($original, static::_resolveArguments($newArguments, $initialArguments));
-					};
-			}
 
 			private static function _includesWith($pred, $x, $list){
 				$i = 0;
@@ -6384,20 +6335,6 @@
 				}
 
 				return false;
-			}
-
-			private static function _resolveArguments($arguments, $initialArguments){
-				foreach($initialArguments as $key => $argument){
-					if($argument instanceof Placeholder){
-						if($arguments === []){
-							return $initialArguments;
-						}
-
-						$initialArguments[$key] = array_shift($arguments);
-					}
-				}
-
-				return array_merge($initialArguments, $arguments);
 			}
 
 			//</editor-fold>
