@@ -3335,7 +3335,7 @@
 
 			/**
 			 * @internal Logic
-			 * @lik https://ramdajs.com/docs/#cond
+			 * @link https://ramdajs.com/docs/#cond
 			 * @param callable[] ...$args
 			 * @return Closure
 			 */
