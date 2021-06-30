@@ -5792,12 +5792,12 @@
 			/**
 			 * Replaces an index numbered token string for each item in $replaceWith.
 			 * @internal String
-			 * @example R::replaceTokenStrings(["John", "Doe"], "last_name: {1}, first_name: {0}")) => "last_name: Doe, first_name: John"
-			 * @param string[] $replaceWith
+			 * @example R::replaceTokenStrings("last_name: {1}, first_name: {0}"), ["John", "Doe"]) => "last_name: Doe, first_name: John"
 			 * @param string $str
+			 * @param string[] $replaceWith
 			 * @return Closure
 			 */
-			public static function replaceTokenStrings($replaceWith = null, $str = null){
+			public static function replaceTokenStrings($str = null, $replaceWith = null){
 				return static::curryN(2, function($replaceWith, $str){
 					$strCopy = $str;
 
