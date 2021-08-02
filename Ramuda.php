@@ -386,6 +386,7 @@
 			 */
 			public static function emptyVal($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -957,7 +958,9 @@
 			 */
 			public static function concat($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $xType */
 					$xType = static::type($x);
+					/** @var string $yType */
 					$yType = static::type($y);
 
 					if($xType === $yType && $xType === 'string'){
@@ -1023,7 +1026,9 @@
 			 */
 			public static function concatRight($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $xType */
 					$xType = static::type($x);
+					/** @var string $yType */
 					$yType = static::type($y);
 
 					if($xType === $yType && $xType === 'string'){
@@ -1047,6 +1052,7 @@
 			 */
 			public static function drop($count = null, $x = null){
 				return static::curryN(2, function($count, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1070,6 +1076,7 @@
 			 */
 			public static function dropLast($count = null, $x = null){
 				return static::curryN(2, function($count, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1093,6 +1100,7 @@
 			 */
 			public static function dropLastWhile($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1161,6 +1169,7 @@
 			 */
 			public static function dropWhile($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					$unsetTil = function($arr) use ($pred){
@@ -1228,6 +1237,7 @@
 			 */
 			public static function endsWith($val = null, $x = null){
 				return static::curryN(2, function($val, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1262,6 +1272,7 @@
 			 */
 			public static function filter($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1535,6 +1546,7 @@
 			 */
 			public static function includes($searchFor = null, $x = null){
 				return static::curryN(2, function($searchFor, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1721,6 +1733,7 @@
 			 */
 			public static function length($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -1858,6 +1871,7 @@
 			 */
 			public static function map($mapper = null, $x = null){
 				return static::curryN(2, function($mapper, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -1909,6 +1923,7 @@
 			 */
 			public static function mapIndexed($mapper = null, $x = null){
 				return static::curryN(2, function($mapper, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2104,6 +2119,7 @@
 			 */
 			public static function nth($index = null, $x = null){
 				return static::curryN(2, function($index, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2163,6 +2179,7 @@
 			 */
 			public static function partition($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -2279,6 +2296,7 @@
 			 */
 			public static function reduce($reducer = null, $defaultVal = null, $x = null){
 				return static::curryN(3, function($reducer, $defaultVal, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object' || $type === 'array' || $type === 'string'){
@@ -2332,6 +2350,7 @@
 			 */
 			public static function reduceRight($reducer = null, $defaultVal = null, $x = null){
 				return static::curryN(3, function($reducer, $defaultVal, $x){
+					/** @var string $type */
 					$type = static::type($x);
 					$reducee = null;
 
@@ -2358,12 +2377,13 @@
 			 */
 			public static function reduceWhile($pred = null, $reducer = null, $defaultVal = null, $x = null){
 				return static::curryN(4, function($pred, $reducer, $defaultVal, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
 						$objAcc = $defaultVal;
 
-						foreach($x as $key => $value){
+						foreach($x as $value){
 							if($pred($objAcc, $value) === false){
 								break;
 							}
@@ -2456,6 +2476,7 @@
 			 */
 			public static function remove($start = null, $count = null, $x = null){
 				return static::curryN(3, function($start, $count, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2543,6 +2564,7 @@
 			 */
 			public static function slice($from = null, $to = null, $x = null){
 				return static::curryN(3, function($from, $to, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2618,6 +2640,7 @@
 			 */
 			public static function splitAt($index = null, $x = null){
 				return static::curryN(2, function($index, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -2645,6 +2668,7 @@
 			 */
 			public static function splitEvery($length = null, $x = null){
 				return static::curryN(2, function($length, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type !== 'array' && $type !== 'string'){
@@ -2681,6 +2705,7 @@
 			 */
 			public static function splitWhen($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 					/**@var array $arr */
 					$arr = $x;
@@ -2710,6 +2735,7 @@
 			 */
 			public static function startsWith($prefix = null, $x = null){
 				return static::curryN(2, function($prefix, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2733,6 +2759,7 @@
 			 */
 			public static function tail($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2755,6 +2782,7 @@
 			 */
 			public static function take($count = null, $x = null){
 				return static::curryN(2, function($count, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2777,6 +2805,7 @@
 			 */
 			public static function takeLast($count = null, $x = null){
 				return static::curryN(2, function($count, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'string'){
@@ -2799,6 +2828,7 @@
 			 */
 			public static function takeLastWhile($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 					/**@var array $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
@@ -2832,6 +2862,7 @@
 			 */
 			public static function takeWhile($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 					/** @var array|string $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
@@ -3634,7 +3665,7 @@
 			 */
 			public static function propSatisfies($pred = null, $key = null, $x = null){
 				return static::curryN(3, function($pred, $key, $x){
-					return $pred(static::prop($key, $x)) ? true : false;
+					return (bool)$pred(static::prop($key, $x));
 				})(...func_get_args());
 			}
 
@@ -3695,7 +3726,7 @@
 			 */
 			public static function xorOp($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
-					return (bool)($x xor $y);
+					return ($x xor $y);
 				})(...func_get_args());
 			}
 
@@ -3963,6 +3994,7 @@
 			 */
 			public static function assoc($key = null, $val = null, $x = null){
 				return static::curryN(3, function($key, $val, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -3990,6 +4022,7 @@
 			 */
 			public static function assocPath($keys = null, $val = null, $x = null){
 				return static::curryN(3, function($keys, $val, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -4028,6 +4061,7 @@
 			 */
 			public static function dissoc($key = null, $x = null){
 				return static::curryN(2, function($key, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -4055,6 +4089,7 @@
 			 */
 			public static function dissocPath($keys = null, $x = null){
 				return static::curryN(2, function($keys, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'array'){
@@ -4117,7 +4152,9 @@
 			 */
 			public static function eqProps($key = null, $x = null, $y = null){
 				return static::curryN(3, function($key, $x, $y){
+					/** @var string $type1 */
 					$type1 = static::type($x);
+					/** @var string $type2 */
 					$type2 = static::type($y);
 
 					if($type1 === 'array' && $type2 === 'array'){
@@ -4163,6 +4200,7 @@
 			 */
 			public static function has($key = null, $x = null){
 				return static::curryN(2, function($key, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4191,6 +4229,7 @@
 			 */
 			public static function hasPath($path = null, $x = null){
 				return static::curryN(2, function($path, $x){
+					/** @var string $type */
 					$type = static::type($x);
 					$subObject = null;
 					$counter = 0;
@@ -4206,6 +4245,7 @@
 					}
 
 					foreach($path as $key){
+						/** @var string $propType */
 						$propType = static::type($subObject);
 
 						if(static::has($key, $subObject) === true){
@@ -4237,6 +4277,7 @@
 				return static::curryN(1, function($x){
 					/** @var array|object $props */
 					$props = static::keys($x);
+					/** @var string $type */
 					$type = static::type($x);
 					$len = count($props);
 					$idx = 0;
@@ -4279,6 +4320,7 @@
 				return static::curryN(1, function($x){
 					/** @var array $props */
 					$props = static::keys($x);
+					/** @var string $type */
 					$type = static::type($x);
 					$len = count($props);
 					$idx = 0;
@@ -4319,6 +4361,7 @@
 			 */
 			public static function keys($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4377,6 +4420,7 @@
 			 */
 			public static function mapObjIndexed($mapper = null, $x = null){
 				return static::curryN(2, function($mapper, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4411,7 +4455,9 @@
 			 */
 			public static function merge($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $type1 */
 					$type1 = static::type($x);
+					/** @var string $type2 */
 					$type2 = static::type($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
@@ -4458,7 +4504,9 @@
 			 */
 			public static function mergeLeft($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $type1 */
 					$type1 = static::type($x);
+					/** @var string $type2 */
 					$type2 = static::type($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
@@ -4511,7 +4559,9 @@
 			 */
 			public static function mergeWithKey($f = null, $x = null, $y = null){
 				return static::curryN(3, function($f, $x, $y){
+					/** @var string $type1 */
 					$type1 = static::type($x);
+					/** @var string $type2 */
 					$type2 = static::type($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
@@ -4577,6 +4627,7 @@
 			 */
 			public static function omit($keys = null, $x = null){
 				return static::curryN(2, function($keys, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4612,6 +4663,7 @@
 			 */
 			public static function omitBy($f = null, $x = null){
 				return static::curryN(2, function($f, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4662,7 +4714,9 @@
 					$current = &$x;
 
 					foreach($path as $key){
-						$current = (static::type($x) === 'array') ? $current[$key] : $current->$key;
+						/** @var string $type */
+						$type = static::type($x);
+						$current = ($type === 'array') ? $current[$key] : $current->$key;
 					}
 
 					return $current;
@@ -4711,6 +4765,7 @@
 			 */
 			public static function pick($keys = null, $x = null){
 				return static::curryN(2, function($keys, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4750,6 +4805,7 @@
 			 */
 			public static function pickAll($keys = null, $defaultVal = null, $x = null){
 				return static::curryN(3, function($keys, $defaultVal, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4784,6 +4840,7 @@
 			 */
 			public static function pickBy($pred = null, $x = null){
 				return static::curryN(2, function($pred, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4824,6 +4881,7 @@
 			 */
 			public static function project($props = null, $x = null){
 				return static::curryN(2, function($props, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type !== 'array'){
@@ -4834,6 +4892,7 @@
 						return [];
 					}
 
+					/** @var string $type0 */
 					$type0 = static::type($x[0]);
 					$results = [];
 
@@ -4873,6 +4932,7 @@
 			 */
 			public static function prop($key = null, $x = null){
 				return static::curryN(2, function($key, $x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object'){
@@ -4933,6 +4993,7 @@
 			 */
 			public static function toPairs($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 					$keys = static::keys($x);
 					$results = [];
@@ -4986,6 +5047,7 @@
 			 */
 			public static function values($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 					$keys = static::keys($x);
 					$results = [];
@@ -5026,6 +5088,7 @@
 			 */
 			public static function where($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $type */
 					$type = static::type($x);
 					$keys = static::keys($x);
 
@@ -5065,6 +5128,7 @@
 			 */
 			public static function whereEq($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
+					/** @var string $type */
 					$type = static::type($x);
 					$keys = static::keys($x);
 
@@ -5711,6 +5775,7 @@
 			 */
 			public static function endsWithSuffixIgnoreCase($str = null, $in = null){
 				return static::curryN(2, function($str, $in){
+					/** @var string $suffix */
 					$suffix = static::takeLast(strlen($str), $in);
 					return strtolower($suffix) === strtolower($str);
 				})(...func_get_args());
@@ -5844,6 +5909,7 @@
 			 */
 			public static function startsWithPrefixIgnoreCase($str = null, $in = null){
 				return static::curryN(2, function($str, $in){
+					/** @var string $prefix */
 					$prefix = static::take(strlen($str) - 1, $in);
 					return strtolower($prefix) === strtolower($str);
 				})(...func_get_args());
@@ -5858,7 +5924,7 @@
 			 */
 			public static function test($regEx = null, $str = null){
 				return static::curryN(2, function($regEx, $str){
-					return preg_match($regEx, $str) ? true : false;
+					return (bool)preg_match($regEx, $str);
 				})(...func_get_args());
 			}
 
@@ -5953,6 +6019,7 @@
 			 */
 			public static function toString($x = null){
 				return static::curryN(1, function($x){
+					/** @var string $type */
 					$type = static::type($x);
 
 					if($type === 'object' || $type === 'array'){
@@ -6031,7 +6098,7 @@
 			 */
 			public static function wrapWith($arr = null, $str = null){
 				return static::curryN(2, function($arr, $str){
-					return (count($arr) === 2) ? "{$arr[0]}{$str}{$arr[1]}" : "{$arr[0]}{$str}{$arr[0]}";
+					return (count($arr) === 2) ? "$arr[0]$str$arr[1]" : "$arr[0]$str$arr[0]";
 				})(...func_get_args());
 			}
 
@@ -6147,7 +6214,7 @@
 			 */
 			public static function isNilOrEmpty($val = null){
 				return static::curryN(1, function($val){
-					return ($val === null) || empty($val);
+					return empty($val);
 				})(...func_get_args());
 			}
 
@@ -6292,6 +6359,7 @@
 			public static function toType($type = null, $val = null){
 				return static::curryN(2, function($type, $val){
 					$copy = $val;
+					/** @var string $valType */
 					$valType = static::type($val);
 
 					if($valType === 'object'){
