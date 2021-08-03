@@ -5967,7 +5967,7 @@
 				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = trim($str);
-					return str_replace(" ", "-", $str);
+					return str_replace(" ", "-", strtolower($str));
 				})(...func_get_args());
 			}
 
@@ -6007,7 +6007,7 @@
 				return static::curryN(1, function($str){
 					$str = preg_replace('/[^a-z0-9]+/i', ' ', $str);
 					$str = trim($str);
-					return str_replace(" ", "_", $str);
+					return str_replace(" ", "_", strtolower($str));
 				})(...func_get_args());
 			}
 
