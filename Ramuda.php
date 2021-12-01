@@ -25,7 +25,7 @@
 
 		abstract class R{
 
-			private static $placeholder;
+			public static $_;
 
 			//<editor-fold desc="FUNCTION">
 
@@ -326,7 +326,7 @@
 
 						while($combinedIdx < count($recv) || $argsIdx < count($args)){
 							if($combinedIdx < count($recv)
-								&& ($recv[$combinedIdx] !== static::_() || $argsIdx > count($args))){
+								&& ($recv[$combinedIdx] !== static::$_ || $argsIdx > count($args))){
 								$result = $recv[$combinedIdx];
 							}
 							else{
@@ -337,7 +337,7 @@
 							$combined[$combinedIdx] = $result;
 							$combinedIdx += 1;
 
-							if($result !== static::_()){
+							if($result !== static::$_){
 								$left -= 1;
 							}
 						}
@@ -6408,7 +6408,7 @@
 			//</editor-fold>
 		}
 
-		class Placeholder{
-			//used for curry arg skipping
-		}
+		class Placeholder{};
+
+		R::$_ = new Placeholder();
 	}
