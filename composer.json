@@ -12,7 +12,6 @@
 	"require": {
 		"php": "^5.6"
 	},
-	"minimum-stability": "stable",
 	"autoload": {
 		"files": ["src/Ramuda.php"]
 	}
