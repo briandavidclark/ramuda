@@ -11,6 +11,8 @@ Requires PHP 5.6 or higher.
 Usage example:
 
 ```php
+use ramuda\R;
+
 $users = [
    ['id'=>'45', 'fName'=>'Jane', 'lName'=>'Doe'],
    ['id'=>'22', 'fName'=>'John', 'lName'=>'Doe'],

@@ -1,0 +1,19 @@
+{
+	"name": "briandavidclark/ramuda",
+	"description": "Functional programming helper library for PHP based on Ramda.js",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Brian Clark",
+			"email": "briandavidclark1974@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=5.6"
+	},
+	"minimum-stability": "stable",
+	"autoload": {
+		"files": ["src/Ramuda.php"]
+	}
+}

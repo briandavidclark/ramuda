@@ -14,7 +14,7 @@
 	 * @since 2020-05-13
 	 */
 
-	namespace Ramuda {
+	namespace ramuda {
 
 		use Closure;
 		use RecursiveArrayIterator;
@@ -138,7 +138,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#apply
 			 * @param callable $f
-			 * @param mixed[] $argArr
+			 * @param array $argArr
 			 * @return Closure
 			 */
 			public static function apply($f = null, $argArr = null){
