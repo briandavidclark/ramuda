@@ -31,7 +31,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not needed
+			 * reason: not sure if necessary
 			 * https://ramdajs.com/docs/#addIndex
 			 */
 
@@ -1857,7 +1857,7 @@
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#map
-			 * @param callable $mapper
+			 * @param callable $mapper - receives $value, $key and $index args
 			 * @param array|object|string $x
 			 * @return Closure
 			 */
