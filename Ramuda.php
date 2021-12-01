@@ -29,14 +29,6 @@
 
 			//<editor-fold desc="FUNCTION">
 
-			/**
-			 * Used as a placeholder when currying.
-			 * @return Placeholder
-			 */
-			public static function _(){
-				return static::$placeholder ?: (static::$placeholder = new Placeholder());
-			}
-
 			/*
 			 * OMITTED
 			 * reason: not needed
