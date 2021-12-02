@@ -4379,12 +4379,6 @@
 			 * https://ramdajs.com/docs/#lensProp
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#lensProp
-			 */
-
 			/**
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mapObjIndexed
@@ -4921,13 +4915,53 @@
 			}
 
 			/**
+			 * Returns the value found at the path specified in $path array.
+			 * Returns null if path is invalid. Works with objects or arrays.
+			 *
+			 * @example
+			 * $a = [
+			 *     "key1" => ["value1"]
+			 * ];
+			 *
+			 * prop_at(['key1', 0], $a); ==> returns "value1"
+			 * prop_at(['key1', 1], $a); ==> returns null
+			 *
 			 * @internal Object
-			 * @link https://ramdajs.com/docs/#propOr
-			 * @param string $val
-			 * @param string $key
-			 * @param object|array $x
+			 * @param array<int|string> $path - can contain strings or integers
+			 * @param object|array $on - Object or array to search on.
 			 * @return Closure
 			 */
+			public static function propAt($path = null, $on = null){
+				return static::curryN(2, function($path, $on){
+					return array_reduce($path, function($acc, $x){
+						if($acc === null){
+							return null;
+						}
+
+						/** @var string $type */
+						$type = static::type($acc);
+
+						if($type === 'array'){
+							return array_key_exists($x, $acc) ? $acc[$x] : null;
+						}
+						elseif($type === 'object'){
+							return property_exists($acc, $x) ? $acc->$x : null;
+						}
+						else{
+							return null;
+						}
+					}, $on);
+					})(...func_get_args());
+				}
+
+				/**
+				 * @internal Object
+				 * @link https://ramdajs.com/docs/#propOr
+				 * @param string $val
+				 * @param string $key
+				 * @param object|array $x
+				 * @return Closure
+				 */
 			public static function propOr($val = null, $key = null, $x = null){
 				return static::curryN(3, function($val, $key, $x){
 					$c = static::cond(
