@@ -4,7 +4,7 @@
 	 * Based on Ramda v0.27 - https://ramdajs.com/docs/
 	 * Based on Ramda Adjunct v2.24.0 - https://char0n.github.io/ramda-adjunct/2.24.0/RA.html
 	 * Based on Ramda Extension v0.10.3 - https://ramda-extension.firebaseapp.com/docs/
-	 * Curry functions based on phamda - https://github.com/mpajunen/phamda
+	 * curryN function based on article by Chantal Broerenhttps - https://dockyard.com/blog/2020/07/17/a-deep-dive-into-currying
 	 *
 	 * Requires a minimum of PHP 5.6
 	 *
@@ -19,6 +19,7 @@
 		use Closure;
 		use RecursiveArrayIterator;
 		use RecursiveIteratorIterator;
+		use ReflectionException;
 		use ReflectionFunction;
 		use stdClass;
 		use Traversable;
@@ -117,8 +118,8 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#ap
 			 * @param callable[] $fArr
-			 * @param mixed[] $vArr
-			 * @return Closure
+			 * @param array $vArr
+			 * @return Closure|array
 			 */
 			public static function ap($fArr = null, $vArr = null){
 				return static::curryN(2, function($fArr, $vArr){
@@ -139,7 +140,7 @@
 			 * @link https://ramdajs.com/docs/#apply
 			 * @param callable $f
 			 * @param array $argArr
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function apply($f = null, $argArr = null){
 				return static::curryN(2, function($f, $argArr){
@@ -158,7 +159,7 @@
 			 * @link https://ramdajs.com/docs/#applyTo
 			 * @param mixed $x
 			 * @param callable $f
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function applyTo($x = null, $f = null){
 				return static::curryN(2, function($x, $f){
@@ -172,7 +173,7 @@
 			 * @param callable $f
 			 * @param mixed $x
 			 * @param mixed $y
-			 * @return Closure
+			 * @return Closure|int
 			 */
 			public static function ascend($f = null, $x = null, $y = null){
 				return static::curryN(3, function($f, $x, $y){
@@ -214,7 +215,7 @@
 			 * @param callable $pred
 			 * @param mixed $x
 			 * @param mixed $y
-			 * @return Closure
+			 * @return Closure|int
 			 */
 			public static function comparator($pred = null, $x = null, $y = null){
 				return static::curryN(3, function($pred, $x, $y){
@@ -294,6 +295,7 @@
 			 * @link https://ramdajs.com/docs/#curry
 			 * @param callable|null $f
 			 * @return Closure
+			 * @throws ReflectionException
 			 */
 			public static function curry($f){
 				$r = new ReflectionFunction($f);
@@ -308,42 +310,25 @@
 			 * @return Closure
 			 */
 			public static function curryN($n, $f){
-				$curryNRec = function($recv) use ($n, $f, &$curryNRec){
-					return function() use ($recv, $n, $f, &$curryNRec){
-						$left = $n;
-						$argsIdx = 0;
-						$combined = array();
-						$combinedIdx = 0;
-						$args = func_get_args();
+				$wait1 = function(...$args1) use (&$wait1, $f, $n){
+					$wait2 = function(...$args2) use (&$wait1, $f, $n, $args1){
+						$providedArgs = array_map(function($arg) use (&$wait1, $args2){
+							return $arg === static::$_ && count($args2) ? array_shift($args2) : $arg;
+						}, $args1);
 
-						while($combinedIdx < count($recv) || $argsIdx < count($args)){
-							if($combinedIdx < count($recv)
-								&& ($recv[$combinedIdx] !== static::$_ || $argsIdx > count($args))){
-								$result = $recv[$combinedIdx];
-							}
-							else{
-								$result = $args[$argsIdx];
-								$argsIdx += 1;
-							}
-
-							$combined[$combinedIdx] = $result;
-							$combinedIdx += 1;
-
-							if($result !== static::$_){
-								$left -= 1;
-							}
-						}
-
-						if($left <= 0){
-							return call_user_func_array($f, $combined);
-						}
-						else{
-							return $curryNRec($combined);
-						}
+						return call_user_func_array($wait1, array_merge($providedArgs, $args2));
 					};
+
+					$filteredArgs = array_values(
+						array_filter($args1, function($arg){
+							return $arg !== static::$_;
+						})
+					);
+
+					return count($filteredArgs) >= $n ? call_user_func_array($f, $args1) : $wait2;
 				};
 
-				return $curryNRec([]);
+				return $wait1;
 			}
 
 			/**
@@ -352,7 +337,7 @@
 			 * @param callable $f
 			 * @param mixed $x
 			 * @param mixed $y
-			 * @return Closure
+			 * @return Closure|int
 			 */
 			public static function descend($f = null, $x = null, $y = null){
 				return static::curryN(3, function($f, $x, $y){
@@ -374,7 +359,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#empty
 			 * @param mixed $x
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function emptyVal($x = null){
 				return static::curryN(1, function($x){
@@ -441,7 +426,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#identity
 			 * @param mixed $x
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function identity($x = null){
 				return static::curryN(1, function($x){
@@ -453,7 +438,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#juxt
 			 * @param callable[] $fArr
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function juxt($fArr = null){
 				return function(...$args) use ($fArr){
@@ -481,7 +466,7 @@
 			 * @param callable $keyF - must return an int or string value
 			 * @param callable $f
 			 * @param mixed $val
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function memoizeWith($keyF = null, $f = null, $val = null){
 				$cache = [];
@@ -507,7 +492,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#nthArg
 			 * @param int $index
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function nthArg($index){
 				return function(...$args) use ($index){
@@ -521,7 +506,7 @@
 			 * @param callable $f1
 			 * @param callable $f2
 			 * @param mixed $x
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function o($f1 = null, $f2 = null, $x = null){
 				return static::curryN(3, function($f1, $f2, $x){
@@ -533,7 +518,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#of
 			 * @param int $x
-			 * @return Closure
+			 * @return Closure|array
 			 */
 			public static function of($x = null){
 				return static::curryN(1, function($x){
@@ -571,7 +556,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partial
 			 * @param callable $f
-			 * @param mixed[] $argsArr
+			 * @param array $argsArr
 			 * @return Closure
 			 */
 			public static function partial($f, $argsArr){
@@ -584,7 +569,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partialRight
 			 * @param callable $f
-			 * @param mixed[] $argsArr
+			 * @param array $argsArr
 			 * @return Closure
 			 */
 			public static function partialRight($f, $argsArr){
@@ -655,7 +640,7 @@
 			 * @param mixed $val1
 			 * @param mixed $val2
 			 * @param mixed $val3
-			 * @return Closure
+			 * @return Closure|mixed
 			 */
 			public static function toggle($val1 = null, $val2 = null, $val3 = null){
 				return static::curryN(3, function($val1, $val2, $val3){
@@ -727,7 +712,7 @@
 			 * @link https://ramdajs.com/docs/#adjust
 			 * @param int|string $index
 			 * @param callable $f
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function adjust($index = null, $f = null, $arr = null){
@@ -742,7 +727,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#all
 			 * @param callable $pred
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function all($pred = null, $arr = null){
@@ -760,7 +745,7 @@
 			/**
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allEqual
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function allEqual($arr = null){
@@ -781,7 +766,7 @@
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allEqualTo
 			 * @param mixed $x
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function allEqualTo($x = null, $arr = null){
@@ -799,7 +784,7 @@
 			/**
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allUnique
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function allUnique($arr = null){
@@ -814,7 +799,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#any
 			 * @param callable $pred
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function any($pred = null, $arr = null){
@@ -833,7 +818,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#aperture
 			 * @param int $size
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function aperture($size = null, $arr = null){
@@ -861,7 +846,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#append
 			 * @param mixed $val
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function append($val = null, $arr = null){
@@ -903,7 +888,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#chain
 			 * @param callable $f
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function chain($f = null, $arr = null){
@@ -1629,7 +1614,7 @@
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#insertAll
 			 * @param int $index
-			 * @param mixed[] $valArr
+			 * @param array $valArr
 			 * @param array $arr
 			 * @return Closure
 			 */
@@ -3086,7 +3071,7 @@
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#without
-			 * @param mixed[] $values ;
+			 * @param array $values ;
 			 * @param array $arr
 			 * @return Closure
 			 */
@@ -3153,7 +3138,6 @@
 				return static::curryN(2, function($arr1, $arr2){
 					$idx = 0;
 					$iLen = count($arr1);
-					$j = null;
 					$jLen = count($arr2);
 					$result = [];
 
@@ -3728,18 +3712,6 @@
 
 			/**
 			 * @internal Math
-			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.ceil
-			 * @param int|float $x
-			 * @return Closure
-			 */
-			public static function ceil($x = null){
-				return static::curryN(1, function($x){
-					return ceil($x);
-				})(...func_get_args());
-			}
-
-			/**
-			 * @internal Math
 			 * @link https://ramdajs.com/docs/#add
 			 * @param float|int $x
 			 * @param float|int $y
@@ -3748,6 +3720,18 @@
 			public static function add($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
 					return $x + $y;
+				})(...func_get_args());
+			}
+
+			/**
+			 * @internal Math
+			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.ceil
+			 * @param int|float $x
+			 * @return Closure
+			 */
+			public static function ceil($x = null){
+				return static::curryN(1, function($x){
+					return ceil($x);
 				})(...func_get_args());
 			}
 
@@ -4188,7 +4172,7 @@
 			 * @link https://ramdajs.com/docs/#has
 			 * @param string $key
 			 * @param object|array $x
-			 * @return Closure
+			 * @return Closure|bool
 			 */
 			public static function has($key = null, $x = null){
 				return static::curryN(2, function($key, $x){
@@ -4223,7 +4207,6 @@
 				return static::curryN(2, function($path, $x){
 					/** @var string $type */
 					$type = static::type($x);
-					$subObject = null;
 					$counter = 0;
 
 					if($type === 'object'){
@@ -4578,13 +4561,13 @@
 
 						foreach($x as $key => $val){
 							if(static::has($key, $x)){
-								$result[$key] = static::has($key, $y) ? $f($key, $x[$key], $y[$key]) : $x[$key];
+								$result[$key] = static::has($key, $y) ? $f($key, $val, $y[$key]) : $val;
 							}
 						}
 
 						foreach($y as $key => $val){
 							if(static::has($key, $y) && !(static::has($key, $result))){
-								$result[$key] = $y[$key];
+								$result[$key] = $val;
 							}
 						}
 
@@ -4613,7 +4596,7 @@
 			/**
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#omit
-			 * @param mixed[] $keys
+			 * @param array $keys
 			 * @param object|array $x
 			 * @return Closure
 			 */
@@ -5418,9 +5401,6 @@
 			 */
 			public static function intersection($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
-					$longArr = null;
-					$shortArr = null;
-
 					if(count($x) > count($y)){
 						$longArr = $x;
 						$shortArr = $y;
@@ -6261,7 +6241,7 @@
 			/**
 			 * @internal Type
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.isSparseArray
-			 * @param mixed[] $arr
+			 * @param array $arr
 			 * @return Closure
 			 */
 			public static function isSparseArray($arr = null){
@@ -6287,7 +6267,7 @@
 			 * @link https://ramdajs.com/docs/#is
 			 * @param string $type
 			 * @param mixed $val
-			 * @return Closure
+			 * @return Closure|string
 			 */
 			public static function isType($type = null, $val = null){
 				return static::curryN(2, function($type, $val){
@@ -6400,7 +6380,7 @@
 			//</editor-fold>
 		}
 
-		class Placeholder{};
+		class Placeholder{}
 
 		R::$_ = new Placeholder();
 	}
