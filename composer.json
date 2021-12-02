@@ -2,6 +2,7 @@
 	"name": "briandavidclark/ramuda",
 	"description": "Functional programming helper library for PHP based on Ramda.js",
 	"type": "library",
+	"keywords": ["ramuda","ramda","js","functional","functional programming","utility","curry","curried","clojure","haskell"],
 	"license": "MIT",
 	"authors": [
 		{
