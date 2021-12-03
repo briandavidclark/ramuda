@@ -4951,8 +4951,8 @@
 							return null;
 						}
 					}, $on);
-					})(...func_get_args());
-				}
+				})(...func_get_args());
+			}
 
 				/**
 				 * @internal Object
