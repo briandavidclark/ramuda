@@ -8,8 +8,8 @@
 	 *
 	 * Requires a minimum of PHP 5.6
 	 *
-	 * @author Brian Clark
 	 * @link https://github.com/briandavidclark/ramuda
+	 * @author Brian Clark
 	 * @since 2020-05-13
 	 */
 
@@ -4678,16 +4678,25 @@
 			 * @return Closure
 			 */
 			public static function path($path = null, $x = null){
-				return static::curryN(2, function($path, $x){
-					$current = &$x;
+				return static::curryN(2, function($path, $on){
+					return array_reduce($path, function($acc, $x){
+						if($acc === null){
+							return null;
+						}
 
-					foreach($path as $key){
 						/** @var string $type */
-						$type = static::type($x);
-						$current = ($type === 'array') ? $current[$key] : $current->$key;
-					}
+						$type = static::type($acc);
 
-					return $current;
+						if($type === 'array'){
+							return array_key_exists($x, $acc) ? $acc[$x] : null;
+						}
+						elseif($type === 'object'){
+							return property_exists($acc, $x) ? $acc->$x : null;
+						}
+						else{
+							return null;
+						}
+					}, $on);
 				})(...func_get_args());
 			}
 
@@ -4748,7 +4757,7 @@
 						return $newObj;
 					}
 					elseif($type === 'array'){
-						$newArr =[];
+						$newArr = [];
 
 						foreach($keys as $key){
 							if(array_key_exists($key, $x)){
@@ -4915,53 +4924,13 @@
 			}
 
 			/**
-			 * Returns the value found at the path specified in $path array.
-			 * Returns null if path is invalid. Works with objects or arrays.
-			 *
-			 * @example
-			 * $a = [
-			 *     "key1" => ["value1"]
-			 * ];
-			 *
-			 * prop_at(['key1', 0], $a); ==> returns "value1"
-			 * prop_at(['key1', 1], $a); ==> returns null
-			 *
 			 * @internal Object
-			 * @param array<int|string> $path - can contain strings or integers
-			 * @param object|array $on - Object or array to search on.
+			 * @link https://ramdajs.com/docs/#propOr
+			 * @param string $val
+			 * @param string $key
+			 * @param object|array $x
 			 * @return Closure
 			 */
-			public static function propAt($path = null, $on = null){
-				return static::curryN(2, function($path, $on){
-					return array_reduce($path, function($acc, $x){
-						if($acc === null){
-							return null;
-						}
-
-						/** @var string $type */
-						$type = static::type($acc);
-
-						if($type === 'array'){
-							return array_key_exists($x, $acc) ? $acc[$x] : null;
-						}
-						elseif($type === 'object'){
-							return property_exists($acc, $x) ? $acc->$x : null;
-						}
-						else{
-							return null;
-						}
-					}, $on);
-				})(...func_get_args());
-			}
-
-				/**
-				 * @internal Object
-				 * @link https://ramdajs.com/docs/#propOr
-				 * @param string $val
-				 * @param string $key
-				 * @param object|array $x
-				 * @return Closure
-				 */
 			public static function propOr($val = null, $key = null, $x = null){
 				return static::curryN(3, function($val, $key, $x){
 					$c = static::cond(
@@ -5862,17 +5831,17 @@
 			/**
 			 * Replaces an index numbered token string for each item in $replaceWith.
 			 * @internal String
-			 * @example R::replaceTokenStrings("last_name: {1}, first_name: {0}"), ["John", "Doe"]) => "last_name: Doe, first_name: John"
 			 * @param string $str
 			 * @param string[] $replaceWith
 			 * @return Closure
+			 * @example R::replaceTokenStrings("last_name: {1}, first_name: {0}"), ["John", "Doe"]) => "last_name: Doe, first_name: John"
 			 */
 			public static function replaceTokenStrings($str = null, $replaceWith = null){
 				return static::curryN(2, function($replaceWith, $str){
 					$strCopy = $str;
 
 					for($n = 0; $n < count($replaceWith); $n++){
-						$strCopy = implode($replaceWith[$n], explode('{'.$n.'}', $strCopy));
+						$strCopy = implode($replaceWith[$n], explode('{' . $n . '}', $strCopy));
 					}
 
 					return $strCopy;
@@ -6413,7 +6382,8 @@
 			//</editor-fold>
 		}
 
-		class Placeholder{}
+		class Placeholder{
+		}
 
 		R::$_ = new Placeholder();
 	}
