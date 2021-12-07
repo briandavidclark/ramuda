@@ -126,7 +126,7 @@
 
 					foreach($fArr as $f){
 						foreach($vArr as $v){
-							array_push($results, $f($v));
+							$results[] = $f($v);
 						}
 					}
 
@@ -830,10 +830,10 @@
 							$nTuple = [];
 
 							for($i = 0; $i < $size; $i++){
-								array_push($nTuple, $arr[$n + $i]);
+								$nTuple[] = $arr[$n + $i];
 							}
 
-							array_push($result, $nTuple);
+							$result[] = $nTuple;
 						}
 					}
 
@@ -852,7 +852,7 @@
 				return static::curryN(2, function($val, $arr){
 					/** @var array $copy */
 					$copy = static::arrayClone($arr);
-					array_push($copy, $val);
+					$copy[] = $val;
 
 					return $copy;
 				})(...func_get_args());
@@ -1105,7 +1105,7 @@
 
 					foreach($x as $val){
 						if(end($result) !== $val){
-							array_push($result, $val);
+							$result[] = $val;
 						}
 					}
 
@@ -1128,7 +1128,7 @@
 						$matches = $pred(end($result)) === $pred($val);
 
 						if(!$matches){
-							array_push($result, $val);
+							$result[] = $val;
 						}
 					}
 
@@ -1398,7 +1398,7 @@
 					$result = [];
 
 					foreach($it as $val){
-						array_push($result, $val);
+						$result[] = $val;
 					}
 
 					return $result;
@@ -1440,7 +1440,7 @@
 							$acc->$key = [];
 						}
 
-						array_push($acc->$key, $val);
+						$acc->$key[] = $val;
 
 						return $acc;
 					}, new stdClass(), $x);
@@ -1467,7 +1467,7 @@
 							$nextIndex += 1;
 						}
 
-						array_push($result, array_slice($arr, $index, $nextIndex - $index));
+						$result[] = array_slice($arr, $index, $nextIndex - $index);
 						$index = $nextIndex;
 					}
 
@@ -1640,10 +1640,10 @@
 					$len = count($arr);
 
 					for($n = 0; $n < $len; $n++){
-						array_push($result, $arr[$n]);
+						$result[] = $arr[$n];
 
 						if($n < $len - 1){
-							array_push($result, $val);
+							$result[] = $val;
 						}
 					}
 
@@ -1855,7 +1855,7 @@
 						$index = 0;
 
 						foreach($x as $key => $value){
-							array_push($result, $mapper($value, $key, $index));
+							$result[] = $mapper($value, $key, $index);
 							$index++;
 						}
 
@@ -1879,7 +1879,7 @@
 						$index = 0;
 
 						foreach($strArr as $key => $value){
-							array_push($result, $mapper($value, $key, $index));
+							$result[] = $mapper($value, $key, $index);
 							$index++;
 						}
 
@@ -1906,7 +1906,7 @@
 						$result = [];
 
 						for($n = 0; $n < count($x); $n++){
-							array_push($result, $mapper($x[$n], $n));
+							$result[] = $mapper($x[$n], $n);
 						}
 
 						return $result;
@@ -2179,10 +2179,10 @@
 
 						foreach($x as $val){
 							if($pred($val) === true){
-								array_push($trueArr, $val);
+								$trueArr[] = $val;
 							}
 							else{
-								array_push($falseArr, $val);
+								$falseArr[] = $val;
 							}
 						}
 
@@ -2207,7 +2207,7 @@
 
 					foreach($indexes as $index){
 						$i = ($index < 0) ? ($arrLen + $index) : $index;
-						array_push($results, $arr[$i]);
+						$results[] = $arr[$i];
 					}
 
 					return $results;
@@ -2255,7 +2255,7 @@
 					$results = [];
 
 					for($n = $x; $n < $y; $n++){
-						array_push($results, $n);
+						$results[] = $n;
 					}
 
 					return $results;
@@ -2657,12 +2657,12 @@
 
 					while($idx < $count){
 						if($type === 'array'){
-							array_push($result, array_slice($x, $idx, $length));
+							$result[] = array_slice($x, $idx, $length);
 						}
 						elseif($type === 'string'){
 							$sub = substr($x, $idx, $length);
 							$sub = ($sub === false) ? '' : $sub;
-							array_push($result, $sub);
+							$result[] = $sub;
 						}
 
 						$idx += $length;
@@ -2814,7 +2814,7 @@
 
 						for($n = count($y) - 1; $n > 0; $n--){
 							if($pred($y[$n]) === true){
-								array_push($results, $y[$n]);
+								$results[] = $y[$n];
 							}
 							else{
 								break;
@@ -2848,7 +2848,7 @@
 
 						for($n = 0; $n < count($y); $n++){
 							if($pred($y[$n]) === true){
-								array_push($results, $y[$n]);
+								$results[] = $y[$n];
 							}
 							else{
 								break;
@@ -2874,7 +2874,7 @@
 					$result = [];
 
 					for($n = 0; $n < $count; $n++){
-						array_push($result, $f($n));
+						$result[] = $f($n);
 					}
 
 					return $result;
@@ -2907,7 +2907,7 @@
 								$result[$j] = [];
 							}
 
-							array_push($result[$j], $innerArr[$j]);
+							$result[$j][] = $innerArr[$j];
 							$j += 1;
 						}
 
@@ -2986,8 +2986,8 @@
 						$applied = $f($val);
 
 						if(!in_array($val, $result, true) && !in_array($applied, $set, true)){
-							array_push($set, $applied);
-							array_push($result, $val);
+							$set[] = $applied;
+							$result[] = $val;
 						}
 					}
 
@@ -3030,7 +3030,7 @@
 						}
 
 						if($hasIndex === false){
-							array_push($result, $val);
+							$result[] = $val;
 						}
 					}
 
@@ -3080,7 +3080,7 @@
 
 					foreach($arr as $item){
 						if(!in_array($item, $values, true)){
-							array_push($results, $item);
+							$results[] = $item;
 						}
 					}
 
@@ -3100,7 +3100,7 @@
 					$results = [];
 
 					foreach($arr as $val){
-						array_push($results, [$x, $val]);
+						$results[] = [$x, $val];
 					}
 
 					return $results;
@@ -3119,7 +3119,7 @@
 					$results = [];
 
 					foreach($arr as $val){
-						array_push($results, [$val, $x]);
+						$results[] = [$val, $x];
 					}
 
 					return $results;
@@ -3879,7 +3879,7 @@
 			 */
 			public static function product($x = null){
 				return static::curryN(1, function($x){
-					return R::reduce(function($acc, $num){
+					return static::reduce(function($acc, $num){
 						return $acc * $num;
 					}, 1, $x);
 				})(...func_get_args());
@@ -3937,7 +3937,7 @@
 			 */
 			public static function sum($x = null){
 				return static::curryN(1, function($x){
-					return R::reduce(function($acc, $num){
+					return static::reduce(function($acc, $num){
 						return $acc + $num;
 					}, 0, $x);
 				})(...func_get_args());
@@ -4355,29 +4355,57 @@
 			 * https://ramdajs.com/docs/#keysIn
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#lens
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#lens
+			 * @param callable $getter
+			 * @param callable $setter
+			 * @return Closure
 			 */
+			public static function lens($getter = null, $setter = null){
+				return static::curryN(2, function($getter, $setter){
+					return array(
+						'getter' => $getter,
+						'setter' => $setter
+					);
+				})(...func_get_args());
+			}
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#lensIndex
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#lensIndex
+			 * @param int $x
+			 * @return Closure
 			 */
+			public static function lensIndex($x = null){
+				return static::curryN(1, function($x){
+					return static::lens(static::nth($x), static::update($x));
+				})(...func_get_args());
+			}
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#lensPath
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#lensPath
+			 * @param array $x
+			 * @return Closure
 			 */
+			public static function lensPath($x = null){
+				return static::curryN(1, function($x){
+					return static::lens(static::path($x), static::assocPath($x));
+				})(...func_get_args());
+			}
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#lensProp
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#lensProp
+			 * @param string $x
+			 * @return Closure
 			 */
+			public static function lensProp($x = null){
+				return static::curryN(1, function($x){
+					return static::lens(static::prop($x), static::assoc($x));
+				})(...func_get_args());
+			}
 
 			/**
 			 * @internal Object
@@ -4664,11 +4692,19 @@
 				})(...func_get_args());
 			}
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#over
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#over
+			 * @param object $lens
+			 * @param callable $f
+			 * @param mixed $x
+			 * @return Closure
 			 */
+			public static function over($lens = null, $f = null, $x = null){
+				return static::curryN(3, function($lens, $f, $x){
+					return $lens['setter']($f($lens['getter']($x)), $x);
+				})(...func_get_args());
+			}
 
 			/**
 			 * @internal Object
@@ -4712,7 +4748,7 @@
 					$results = [];
 
 					foreach($paths as $path){
-						array_push($results, static::path($path, $x));
+						$results[] = static::path($path, $x);
 					}
 
 					return $results;
@@ -4881,7 +4917,7 @@
 								$newObj->$prop = static::has($prop, $arr) ? $arr->$prop : null;
 							}
 
-							array_push($results, $newObj);
+							$results[] = $newObj;
 						}
 					}
 					elseif($type0 === 'array'){
@@ -4892,7 +4928,7 @@
 								$newArr[$prop] = static::has($prop, $arr) ? $arr[$prop] : null;
 							}
 
-							array_push($results, $newArr);
+							$results[] = $newArr;
 						}
 					}
 
@@ -4956,11 +4992,19 @@
 				})(...func_get_args());
 			}
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#set
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#set
+			 * @param object $lens
+			 * @param mixed $x
+			 * @param mixed $y
+			 * @return Closure
 			 */
+			public static function set($lens = null, $x = null, $y = null){
+				return static::curryN(3, function($lens, $x, $y){
+					return $lens['setter']($x, $y);
+				})(...func_get_args());
+			}
 
 			/**
 			 * @internal Object
@@ -4977,16 +5021,16 @@
 
 					if($type === 'object'){
 						foreach($keys as $key){
-							array_push($results, [$key, $x->$key]);
+							$results[] = [$key, $x->$key];
 						}
 					}
 					elseif($type === 'array'){
 						foreach($keys as $key){
-							array_push($results, [$key, $x[$key]]);
+							$results[] = [$key, $x[$key]];
 						}
 					}
 
-					return null;
+					return $results;
 				})(...func_get_args());
 			}
 
@@ -5003,7 +5047,7 @@
 					foreach($obj as $key => $value){
 						$newObj = new stdClass();
 						$newObj->$key = $value;
-						array_push($results, $newObj);
+						$results[] = $newObj;
 					}
 
 					return $results;
@@ -5031,16 +5075,16 @@
 
 					if($type === 'object'){
 						foreach($keys as $key){
-							array_push($results, $x->$key);
+							$results[] = $x->$key;
 						}
 					}
 					elseif($type === 'array'){
 						foreach($keys as $key){
-							array_push($results, $x[$key]);
+							$results[] = $x[$key];
 						}
 					}
 
-					return null;
+					return $results;
 				})(...func_get_args());
 			}
 
@@ -5050,11 +5094,18 @@
 			 * https://ramdajs.com/docs/#valuesIn
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: Lens functions beyond the scope of this library
-			 * https://ramdajs.com/docs/#view
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#view
+			 * @param object $lens
+			 * @param mixed $x
+			 * @return Closure
 			 */
+			public static function view($lens = null, $x = null){
+				return static::curryN(2, function($lens, $x){
+					return $lens['getter']($x);
+				})(...func_get_args());
+			}
 
 			/**
 			 * @internal Object
@@ -5211,7 +5262,7 @@
 					while($idx < $firstLen){
 						if(!static::_includesWith($f, $x[$idx], $y) &&
 							!static::_includesWith($f, $x[$idx], $results)){
-							array_push($results, $x[$idx]);
+							$results[] = $x[$idx];
 						}
 
 						$idx += 1;
@@ -5485,7 +5536,7 @@
 			 */
 			public static function max($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
-					return $y > $x ? $y : $x;
+					return max($y, $x);
 				})(...func_get_args());
 			}
 
@@ -5512,7 +5563,7 @@
 			 */
 			public static function min($x = null, $y = null){
 				return static::curryN(2, function($x, $y){
-					return $y < $x ? $y : $x;
+					return min($y, $x);
 				})(...func_get_args());
 			}
 
@@ -5609,7 +5660,7 @@
 			 */
 			public static function sortBy($f = null, $arr = null){
 				return static::curryN(2, function($f, $arr){
-					return R::sort(function($a, $b) use ($f){
+					return static::sort(function($a, $b) use ($f){
 						$aa = $f($a);
 						$bb = $f($b);
 
@@ -5631,7 +5682,7 @@
 			 */
 			public static function sortWith($fArr = null, $arr = null){
 				return static::curryN(2, function($fArr, $arr){
-					return R::sort(function($a, $b) use ($fArr){
+					return static::sort(function($a, $b) use ($fArr){
 						$result = 0;
 						$i = 0;
 
@@ -6382,8 +6433,7 @@
 			//</editor-fold>
 		}
 
-		class Placeholder{
-		}
+		class Placeholder{}
 
 		R::$_ = new Placeholder();
 	}
