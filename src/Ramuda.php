@@ -4,7 +4,6 @@
 	 * Based on Ramda v0.27 - https://ramdajs.com/docs/
 	 * Based on Ramda Adjunct v2.24.0 - https://char0n.github.io/ramda-adjunct/2.24.0/RA.html
 	 * Based on Ramda Extension v0.10.3 - https://ramda-extension.firebaseapp.com/docs/
-	 * curryN function based on article by Chantal Broerenhttps - https://dockyard.com/blog/2020/07/17/a-deep-dive-into-currying
 	 *
 	 * Requires a minimum of PHP 5.6
 	 *
@@ -314,25 +313,42 @@
 			 * @return Closure
 			 */
 			public static function curryN($n, $f){
-				$wait1 = function(...$args1) use (&$wait1, $f, $n){
-					$wait2 = function(...$args2) use (&$wait1, $f, $n, $args1){
-						$providedArgs = array_map(function($arg) use (&$wait1, $args2){
-							return $arg === static::$_ && count($args2) ? array_shift($args2) : $arg;
-						}, $args1);
+				$curryNRec = function($recv) use ($n, $f, &$curryNRec){
+					return function() use ($recv, $n, $f, &$curryNRec){
+						$left = $n;
+						$argsIdx = 0;
+						$combined = array();
+						$combinedIdx = 0;
+						$args = func_get_args();
 
-						return call_user_func_array($wait1, array_merge($providedArgs, $args2));
+						while($combinedIdx < count($recv) || $argsIdx < count($args)){
+							if($combinedIdx < count($recv)
+								&& ($recv[$combinedIdx] !== static::$_ || $argsIdx > count($args))){
+								$result = $recv[$combinedIdx];
+							}
+							else{
+								$result = $args[$argsIdx];
+								$argsIdx += 1;
+							}
+
+							$combined[$combinedIdx] = $result;
+							$combinedIdx += 1;
+
+							if($result !== static::$_){
+								$left -= 1;
+							}
+						}
+
+						if($left <= 0){
+							return call_user_func_array($f, $combined);
+						}
+						else{
+							return $curryNRec($combined);
+						}
 					};
-
-					$filteredArgs = array_values(
-						array_filter($args1, function($arg){
-							return $arg !== static::$_;
-						})
-					);
-
-					return count($filteredArgs) >= $n ? call_user_func_array($f, $args1) : $wait2;
 				};
 
-				return $wait1;
+				return $curryNRec([]);
 			}
 
 			/**
@@ -5500,7 +5516,7 @@
 			 * @param float|int $x
 			 * @return Closure
 			 */
-			public static function isEven($x){
+			public static function isEven($x = null){
 				return static::curryN(1, function($x){
 					return $x % 2 === 0;
 				})(...func_get_args());
@@ -5512,7 +5528,7 @@
 			 * @param float|int $x
 			 * @return Closure
 			 */
-			public static function isOdd($x){
+			public static function isOdd($x = null){
 				return static::curryN(1, function($x){
 					return $x % 2 !== 0;
 				})(...func_get_args());
