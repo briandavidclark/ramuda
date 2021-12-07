@@ -16,6 +16,7 @@
 	namespace ramuda {
 
 		use Closure;
+		use Exception;
 		use RecursiveArrayIterator;
 		use RecursiveIteratorIterator;
 		use ReflectionException;
@@ -149,7 +150,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if possible in PHP
+			 * reason: Not sure if possible in PHP because methods here are not passable by reference.
 			 * https://ramdajs.com/docs/#applySpec
 			 */
 
@@ -192,7 +193,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful because of currying
+			 * reason: Not sure if possible in PHP. Arity mismatch throws ArgumentCountError.
 			 * https://ramdajs.com/docs/#binary
 			 */
 
@@ -202,11 +203,15 @@
 			 * https://ramdajs.com/docs/#bind
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#call
+			/**
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#call
+			 * @param callable $f
+			 * @return mixed
 			 */
+			public static function call($f, ...$args){
+				return call_user_func_array($f, $args);
+			}
 
 			/**
 			 * @internal Function
@@ -279,13 +284,13 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#constructN
 			 */
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#converge
 			 */
 
@@ -398,13 +403,13 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#flip
 			 */
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#invoker
 			 */
 
@@ -449,13 +454,13 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#lift
 			 */
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#liftN
 			 */
 
@@ -483,7 +488,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful because of currying
+			 * reason: not sure if possible in PHP. Arity mismatch throws ArgumentCountError.
 			 * https://ramdajs.com/docs/#nAry
 			 */
 
@@ -491,7 +496,7 @@
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#nthArg
 			 * @param int $index
-			 * @return Closure|mixed
+			 * @return Closure
 			 */
 			public static function nthArg($index){
 				return function(...$args) use ($index){
@@ -662,15 +667,27 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if possible
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#thunkify
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#tryCatch
+			/**
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#tryCatch
+			 * @param callable $tryer
+			 * @param callable $catcher
+			 * @return Closure
 			 */
+			public static function tryCatch($tryer, $catcher){
+				return function(...$args) use ($tryer, $catcher){
+					try{
+						return call_user_func_array($tryer, $args);
+					}
+					catch(Exception $e){
+						return call_user_func_array($catcher, $args);
+					}
+				};
+			}
 
 			/**
 			 * @internal Function
@@ -686,7 +703,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if useful because of currying
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#unary
 			 */
 
@@ -5425,7 +5442,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure how to implement
+			 * reason: not sure if possible in PHP
 			 * https://ramdajs.com/docs/#identical
 			 */
 
