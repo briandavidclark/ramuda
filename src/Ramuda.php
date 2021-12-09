@@ -904,6 +904,7 @@
 			}
 
 			/**
+			 * Modified version of "objOf" that returns a key/value pair array.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#objOf
 			 * @param string $key
@@ -4641,9 +4642,7 @@
 			 */
 			public static function objOf(...$args){
 				return static::curryN(2, function($key, $val){
-					$obj = new stdClass();
-					$obj->$key = $val;
-					return $obj;
+					return (object)static::arrayOf($key, $val);
 				})(...$args);
 			}
 
