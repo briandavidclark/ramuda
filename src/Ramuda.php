@@ -2297,6 +2297,29 @@
 			}
 
 			/**
+			 * Like 'range' function but with a definable step value.
+			 * Negative step value is required for descending range.
+			 * @internal List
+			 * @param int $start
+			 * @param int $end
+			 * @param int $step
+			 * @return Closure
+			 */
+			public static function rangeStepped(...$args){
+				return static::curryN(3, function($start, $end, $step){
+					$result = [];
+					$current = $start;
+
+					while(($step > 0 && $current <= $end) || ($step < 0 && $current >= $end)){
+						$result[] = $current;
+						$current += $step;
+					}
+
+					return $result;
+				})(...$args);
+			}
+
+			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reduce
 			 * @param callable $reducer
