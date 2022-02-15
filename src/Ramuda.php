@@ -5707,6 +5707,25 @@
 			}
 
 			/**
+			 * Performs a linear conversion between 2 ranges.
+			 * @example R::scale(0, 100, 0, 150, 50) -> 75
+			 *
+			 * @internal Relation
+			 * @param int|float $min1
+			 * @param int|float $max1
+			 * @param int|float $min2
+			 * @param int|float $max2
+			 * @param int|float $x
+			 * @return Closure
+			 */
+			public static function scale(...$args){
+				return static::curryN(5, function($min1, $max1, $min2, $max2, $x){
+					$factor = ($max2 - $min2) / ($max1 - $min1);
+					return $min2 + (($x - $min1) * $factor);
+				})(...$args);
+			}
+
+			/**
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#sortBy
 			 * @param callable $f
