@@ -476,11 +476,27 @@
 				})(...$args);
 			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#invoker
+			/**
+			 * NOTE: Returned function will also accept an array.
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#invoker
+			 * @param int $arity
+			 * @param callable $method
+			 * @return Closure
 			 */
+			public static function invoker(...$args){
+				return static::curryN(2, function($arity, $method){
+					return static::curryN($arity, function(...$params) use ($method){
+						$obj = $params[count($params) - 1];
+
+						if(gettype($obj) === 'array'){
+							return call_user_func_array($obj[$method], $params);
+						}
+
+						return call_user_func_array(array($obj, $method), $params);
+					});
+				})(...$args);
+			}
 
 			/**
 			 * @internal Function
@@ -734,11 +750,23 @@
 			 * https://ramdajs.com/docs/#then
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#thunkify
+			/**
+			 * NOTE: Unlike Ramda `thunkify`, arity of `$f` must be provided as `$arity` arg.
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#thunkify
+			 * @param int $arity
+			 * @param callable $f
+			 * @return Closure|mixed
 			 */
+			public static function thunkify(...$args){
+				return static::curryN(2, function($arity, $f){
+					return static::curryN($arity, function(...$params) use ($f){
+						return function() use ($f, $params){
+							return call_user_func_array($f, $params);
+						};
+					});
+				})(...$args);
+			}
 
 			/**
 			 * @internal Function
