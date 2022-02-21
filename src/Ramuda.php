@@ -281,17 +281,41 @@
 				};
 			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#constructN
+			/**
+			 * NOTE: If class is namespaced, the fully qualified name must be sent to $className.
+			 * @example R::constructN(3, '\MyNamespace\MyClass');
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#constructN
+			 * @param int $arity
+			 * @param string $className
+			 * @return Closure
 			 */
+			public static function constructN(...$args){
+				return static::curryN(2, function($arity, $className){
+					return static::curryN($arity, function(...$constructorArgs) use ($className){
+						return new $className(...$constructorArgs);
+					});
+				})(...$args);
+			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#converge
+			/**
+			 * NOTE: Unlike the Ramda `converge` function, the max arity of the $fs functions must be provided as the `$arity` arg.
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#converge
+			 * @param int $arity
+			 * @param callable $f
+			 * @param callable[] $fs
+			 * @return Closure
 			 */
+			public static function converge(...$args){
+				return static::curryN(3, function($arity, $f, $fs){
+					return static::curryN($arity, function(...$params) use ($f, $fs){
+						return $f(...array_map(function($fn) use ($params){
+							return $fn(...$params);
+						}, $fs));
+					});
+				})(...$args);
+			}
 
 			/**
 			 * @internal Function
@@ -3812,7 +3836,7 @@
 			 */
 			public static function divide(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y / $x;
+					return $x / $y;
 				})(...$args);
 			}
 
@@ -3886,7 +3910,7 @@
 			 */
 			public static function modulo(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y % $x;
+					return $x % $y;
 				})(...$args);
 			}
 
