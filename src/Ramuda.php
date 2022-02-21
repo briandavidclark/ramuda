@@ -31,7 +31,7 @@
 
 			/*
 			 * OMITTED
-			 * reason: not sure if necessary
+			 * reason: not sure if necessary because R::map provides index.
 			 * https://ramdajs.com/docs/#addIndex
 			 */
 
@@ -147,11 +147,30 @@
 				})(...$args);
 			}
 
-			/*
-			 * OMITTED
-			 * reason: Not sure if possible in PHP because methods here are not passable by reference.
-			 * https://ramdajs.com/docs/#applySpec
+			/**
+			 * NOTE: Unlike the Ramda `applySpec` function, the max arity of the applied functions must be provided as the `$arity` arg.
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#applySpec
+			 * @param int $arity
+			 * @param array[]|object $spec
+			 * @return Closure|mixed
 			 */
+			public static function applySpec(...$args){
+				return static::curryN(2, function($arity, $spec){
+					return static::curryN($arity, function(...$params) use ($arity, $spec){
+						return static::map(function($val) use ($arity, $params){
+							if((gettype($val) === 'array' || gettype($val) === 'object') && !is_callable($val)){
+								return static::applySpec($arity, $val)(...$params);
+							}
+							elseif(is_callable($val)){
+								return $val(...$params);
+							}
+
+							return $val;
+						}, $spec);
+					});
+				})(...$args);
+			}
 
 			/**
 			 * @internal Function
@@ -441,11 +460,21 @@
 				};
 			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure if possible in PHP
-			 * https://ramdajs.com/docs/#flip
+			/**
+			 * NOTE: Unlike the Ramda `flip` function, the arity of the `$f` function must be provided as the `$arity` arg.
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#flip
+			 * @param int $arity
+			 * @param callable $f
+			 * @return Closure
 			 */
+			public static function flip(...$args){
+				return static::curryN(2, function($arity, $f){
+					return static::curryN($arity, function(...$params) use ($f){
+						return static::apply($f, static::moveLeft(1, 1, $params));
+					});
+				})(...$args);
+			}
 
 			/*
 			 * OMITTED
@@ -1897,6 +1926,7 @@
 			}
 
 			/**
+			 * NOTE: This function preserves existing `Array` keys.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#map
 			 * @param callable $mapper - receives $value, $key and $index args
@@ -1913,7 +1943,7 @@
 						$index = 0;
 
 						foreach($x as $key => $value){
-							$result[] = $mapper($value, $key, $index);
+							$result[$key] = $mapper($value, $key, $index);
 							$index++;
 						}
 
