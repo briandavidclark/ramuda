@@ -4655,11 +4655,20 @@
 				})(...$args);
 			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#mergeDeepLeft
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#mergeDeepLeft
+			 * @param object $x
+			 * @param object $y
+			 * @return Closure
 			 */
+			public static function mergeDeepLeft(...$args){
+				return static::curryN(2, function($x, $y){
+					return R::mergeDeepWithKey(function($k, $lVal, $rVal){
+						return $lVal;
+					}, $x, $y);
+				})(...$args);
+			}
 
 			/**
 			 * @internal Object
