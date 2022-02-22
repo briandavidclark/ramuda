@@ -4661,17 +4661,21 @@
 			 * https://ramdajs.com/docs/#mergeDeepLeft
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#mergeDeepRight
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#mergeDeepRight
+			 * @param object $x
+			 * @param object $y
+			 * @return Closure
 			 */
+			public static function mergeDeepRight(...$args){
+				return static::curryN(2, function($x, $y){
+					return R::mergeDeepWithKey(function($k, $lVal, $rVal){
+						return $rVal;
+					}, $x, $y);
+				})(...$args);
+			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#mergeDeepWith
-			 */
 			/**
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeDeepWith
