@@ -4287,6 +4287,55 @@
 			 * reason: not sure how to implement
 			 * https://ramdajs.com/docs/#evolve
 			 */
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#evolve
+			 * @param object|array $xfs
+			 * @param object|array $x
+			 * @return Closure
+			 */
+			public static function evolve(...$args){
+				return static::curryN(2, function($xfs, $x){
+					$type = gettype($x);
+
+					if($type === 'object'){
+						$result = new stdClass();
+						$vars = get_object_vars($x);
+
+						foreach($vars as $key => $val){
+							if(isset($xfs->{$key}) && is_callable($xfs->{$key})){
+								$result->{$key} = call_user_func($xfs->{$key}, $val);
+							}
+							elseif(gettype($val) === 'array' || gettype($val) === 'object'){
+								$result->{$key} = static::evolve($xfs->{$key}, $val);
+							}
+							else{
+								$result->{$key} = $val;
+							}
+						}
+					}
+					elseif($type === 'array'){
+						$result = [];
+
+						foreach($x as $key => $val){
+							if(isset($xfs[$key]) && is_callable($xfs[$key])){
+								$result[$key] = call_user_func($xfs[$key], $val);
+							}
+							elseif(gettype($val) === 'array' || gettype($val) === 'object'){
+								$result[$key] = static::evolve($xfs[$key], $val);
+							}
+							else{
+								$result[$key] = $val;
+							}
+						}
+					}
+					else{
+						return $x;
+					}
+
+					return $result;
+				})(...$args);
+			}
 
 			/**
 			 * @internal Object
