@@ -656,6 +656,21 @@
 
 			/**
 			 * @internal Function
+			 * @link https://ramdajs.com/docs/#partialObject
+			 * @param callable $f
+			 * @param object $obj
+			 * @return Closure|mixed
+			 */
+			public static function partialObject(...$args){
+				return static::curryN(2, function($f, $obj){
+					return function($obj2) use ($f, $obj){
+						return $f(R::mergeDeepRight($obj, $obj2));
+					};
+				})(...$args);
+			}
+
+			/**
+			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partialRight
 			 * @param callable $f
 			 * @param array $argsArr
