@@ -4673,11 +4673,26 @@
 			 * https://ramdajs.com/docs/#mergeDeepWith
 			 */
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#mergeDeepWithKey
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#mergeDeepWithKey
+			 * @param callable $f
+			 * @param object $x
+			 * @param object $y
+			 * @return Closure
 			 */
+			public static function mergeDeepWithKey(...$args){
+				return static::curryN(3, function($f, $x, $y){
+					return R::mergeWithKey(function($k, $lVal, $rVal) use ($f){
+						if((gettype($lVal) === 'object' && gettype($rVal) === 'object')){
+							return static::mergeDeepWithKey($f, $lVal, $rVal);
+						}
+						else{
+							return $f($k, $lVal, $rVal);
+						}
+					}, $x, $y);
+				})(...$args);
+			}
 
 			/**
 			 * @internal Object
