@@ -5478,6 +5478,44 @@
 
 			/**
 			 * @internal Object
+			 * @link https://ramdajs.com/docs/#whereAny
+			 * @param object|array $spec
+			 * @param object|array $obj
+			 * @return Closure
+			 */
+			public static function whereAny(...$args){
+				return static::curryN(2, function($spec, $obj){
+					$type1 = gettype($spec);
+					$type2 = gettype($obj);
+
+					if($type1 === 'object' && $type2 === 'object'){
+						$keys = array_keys((array)$spec);
+
+						foreach($keys as $key){
+							if(isset($obj->{$key}) && call_user_func($spec->{$key}, $obj->{$key}) === true){
+								return true;
+							}
+						}
+					}
+					elseif($type1 === 'array' && $type2 === 'array'){
+						$keys = array_keys($spec);
+
+						foreach($keys as $key){
+							if(isset($obj[$key]) && $spec[$key]($obj[$key]) === true){
+								return true;
+							}
+						}
+					}
+					else{
+						return false;
+					}
+
+					return false;
+				})(...$args);
+			}
+
+			/**
+			 * @internal Object
 			 * @link https://ramdajs.com/docs/#whereEq
 			 * @param object|array $x
 			 * @param object|array $y
@@ -5735,7 +5773,7 @@
 			 */
 			public static function gt(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y > $x;
+					return $x > $y;
 				})(...$args);
 			}
 
@@ -5748,7 +5786,7 @@
 			 */
 			public static function gte(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y >= $x;
+					return $x >= $y;
 				})(...$args);
 			}
 
@@ -5839,7 +5877,7 @@
 			 */
 			public static function lt(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y < $x;
+					return $x < $y;
 				})(...$args);
 			}
 
@@ -5852,7 +5890,7 @@
 			 */
 			public static function lte(...$args){
 				return static::curryN(2, function($x, $y){
-					return $y <= $x;
+					return $x <= $y;
 				})(...$args);
 			}
 
