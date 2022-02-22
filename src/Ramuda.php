@@ -2629,13 +2629,23 @@
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reverse
-			 * @param array $arr
+			 * @param array|string $x
 			 * @return Closure
 			 */
 			public static function reverse(...$args){
-				return static::curryN(1, function($arr){
-					$p = static::pipe(static::arrayClone(), 'array_reverse');
-					return $p($arr);
+				return static::curryN(1, function($x){
+					$type = gettype($x);
+
+					if($type === 'array'){
+						return static::pipe(static::arrayClone(), 'array_reverse')($x);
+					}
+					elseif($type === 'string'){
+						/** @var string[] $strArr */
+						$strArr = static::split('', $x);
+						return static::join('', array_reverse($strArr));
+					}
+
+					return $x;
 				})(...$args);
 			}
 
