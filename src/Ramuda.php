@@ -676,11 +676,16 @@
 			public static function pipe(...$args){
 				return function(...$vals) use ($args){
 					$init = call_user_func_array($args[0], $vals);
-					$rest = array_slice($args, 1);
 
-					return array_reduce($rest, function($acc, $f){
-						return $f($acc);
-					}, $init);
+					if(count($args) > 1){
+						$rest = array_slice($args, 1);
+
+						return array_reduce($rest, function($acc, $f){
+							return $f($acc);
+						}, $init);
+					}
+
+					return $init;
 				};
 			}
 
