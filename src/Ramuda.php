@@ -4672,6 +4672,21 @@
 			 * reason: not sure how to implement
 			 * https://ramdajs.com/docs/#mergeDeepWith
 			 */
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#mergeDeepWith
+			 * @param callable $f
+			 * @param object $x
+			 * @param object $y
+			 * @return Closure
+			 */
+			public static function mergeDeepWith(...$args){
+				return static::curryN(3, function($f, $x, $y){
+					return R::mergeDeepWithKey(function($k, $lVal, $rVal) use ($f){
+						return $f($lVal, $rVal);
+					}, $x, $y);
+				})(...$args);
+			}
 
 			/**
 			 * @internal Object
