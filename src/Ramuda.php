@@ -4882,6 +4882,20 @@
 
 			/**
 			 * @internal Object
+			 * @link https://ramdajs.com/docs/#modify
+			 * @param string|int $key
+			 * @param callable $f
+			 * @param object|array $obj
+			 * @return Closure
+			 */
+			public static function modify(...$args){
+				return static::curryN(3, function($key, $f, $obj){
+					return static::modifyPath([$key], $f, $obj);
+				})(...$args);
+			}
+
+			/**
+			 * @internal Object
 			 * @link https://ramdajs.com/docs/#modifyPath
 			 * @param array $path
 			 * @param callable $f
