@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	 * Based on Ramda v0.27 - https://ramdajs.com/docs/
+	 * Based on Ramda v0.28 - https://ramdajs.com/docs/
 	 * Based on Ramda Adjunct v2.24.0 - https://char0n.github.io/ramda-adjunct/2.24.0/RA.html
 	 * Based on Ramda Extension v0.10.3 - https://ramda-extension.firebaseapp.com/docs/
 	 *
@@ -1139,6 +1139,33 @@
 					else{
 						return null;
 					}
+				})(...$args);
+			}
+
+			/**
+			 * @internal List
+			 * @link https://ramdajs.com/docs/#count
+			 * @param callable $pred
+			 * @param string|array|object $xs
+			 * @return Closure
+			 */
+			public static function count(...$args){
+				return static::curryN(2, function($pred, $xs){
+					$type = gettype($xs);
+
+					if($type === 'string'){
+						$xs = str_split($xs);
+					}
+					elseif($type === 'object'){
+						$xs = (array)$xs;
+					}
+					elseif($type !== 'array'){
+						return 0;
+					}
+
+					return array_reduce($xs, function($acc, $x) use ($pred){
+						return $pred($x) ? $acc + 1 : $acc;
+					}, 0);
 				})(...$args);
 			}
 
@@ -4148,7 +4175,7 @@
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#assocPath
 			 * @param string[] $keys
-			 * @param string $val
+			 * @param mixed $val
 			 * @param object|array $x
 			 * @return Closure
 			 */
@@ -4159,28 +4186,33 @@
 
 					if($type === 'array'){
 						$result = static::arrayClone($x);
-						$current = &$result;
-
-						foreach($keys as $key){
-							$current = &$current[$key];
-						}
-
-						$current = $val;
-						return $result;
 					}
 					elseif($type === 'object'){
 						$result = clone $x;
-						$current = &$result;
-
-						foreach($keys as $key){
-							$current = &$current->$key;
-						}
-
-						$current = $val;
-						return $result;
+					}
+					else{
+						return null;
 					}
 
-					return null;
+					$current = &$result;
+					$length = count($keys);
+
+					for($n = 0; $n < $length; $n++){
+						$type = gettype($current);
+
+						if($type === 'array'){
+							$current = &$current[$keys[$n]];
+						}
+						elseif($type === 'object'){
+							$current = &$current->{$keys[$n]};
+						}
+
+						if($n === $length - 1){
+							$current = $val;
+						}
+					}
+
+					return $result;
 				})(...$args);
 			}
 
@@ -4845,6 +4877,27 @@
 					}
 
 					return null;
+				})(...$args);
+			}
+
+			/**
+			 * @internal Object
+			 * @link https://ramdajs.com/docs/#modifyPath
+			 * @param array $path
+			 * @param callable $f
+			 * @param object|array $obj
+			 * @return Closure
+			 */
+			public static function modifyPath(...$args){
+				return static::curryN(3, function($path, $f, $obj){
+					$type = gettype($obj);
+					$val = static::path($path, $obj);
+
+					if(($type !== 'object' && $type !== 'array') || $val === null){
+						return $obj;
+					}
+
+					return static::assocPath($path, $f($val), $obj);
 				})(...$args);
 			}
 
