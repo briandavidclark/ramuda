@@ -5021,12 +5021,12 @@
 			 * @link https://ramdajs.com/docs/#over
 			 * @param object $lens
 			 * @param callable $f
-			 * @param mixed $x
+			 * @param mixed $obj
 			 * @return Closure
 			 */
 			public static function over(...$args){
-				return static::curryN(3, function($lens, $f, $x){
-					return $lens['setter']($f($lens['getter']($x)), $x);
+				return static::curryN(3, function($lens, $f, $obj){
+					return $lens['setter']($f($lens['getter']($obj)), $obj);
 				})(...$args);
 			}
 
@@ -5321,12 +5321,12 @@
 			 * @link https://ramdajs.com/docs/#set
 			 * @param object $lens
 			 * @param mixed $x
-			 * @param mixed $y
+			 * @param mixed $obj
 			 * @return Closure
 			 */
 			public static function set(...$args){
-				return static::curryN(3, function($lens, $x, $y){
-					return $lens['setter']($x, $y);
+				return static::curryN(3, function($lens, $x, $obj){
+					return R::over($lens, R::always($x), $obj);
 				})(...$args);
 			}
 
