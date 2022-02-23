@@ -6747,7 +6747,7 @@
 					if(!is_string($x)){
 						return 0;
 					}
-					elseif(static::includes('.', $x)){
+					elseif(strpos($x, '.') !== false){
 						return floatval(preg_replace("/[^0-9.]/", '', $x));
 					}
 					else{
