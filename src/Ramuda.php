@@ -4347,11 +4347,6 @@
 				})(...$args);
 			}
 
-			/*
-			 * OMITTED
-			 * reason: not sure how to implement
-			 * https://ramdajs.com/docs/#evolve
-			 */
 			/**
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#evolve
