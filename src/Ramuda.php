@@ -6737,20 +6737,21 @@
 			}
 
 			/**
+			 * Strips non-numeric chars and converts to either float or int.
 			 * @internal Type
 			 * @param string $x
 			 * @return Closure
 			 */
 			public static function toNumber(...$args){
 				return static::curryN(1, function($x){
-					if(!is_numeric($x)){
-						return null;
+					if(!is_string($x)){
+						return 0;
 					}
 					elseif(static::includes('.', $x)){
-						return floatval($x);
+						return floatval(preg_replace("/[^0-9.]/", '', $x));
 					}
 					else{
-						return intval($x);
+						return intval(preg_replace("/[^0-9]/", '', $x));
 					}
 				})(...$args);
 			}
