@@ -687,17 +687,25 @@
 			 * @link https://ramdajs.com/docs/#pipe
 			 * @param callable ...$fs
 			 * @return Closure
+			 * @throws Exception
 			 */
 			public static function pipe(...$fs){
 				return function(...$vals) use ($fs){
-					$init = call_user_func_array($fs[0], $vals);
+					if(count($fs) < 1){
+						throw new Exception('Function "pipe" must have at least one argument.');
+					}
+					else{
+						$init = call_user_func_array($fs[0], $vals);
 
-					if(count($fs) > 1){
-						$rest = array_slice($fs, 1);
-
-						return array_reduce($rest, function($acc, $f){
-							return $f($acc);
-						}, $init);
+						if(count($fs) > 1){
+							return array_reduce(
+								array_slice($fs, 1),
+								function($acc, $f){
+									return $f($acc);
+								},
+								$init
+							);
+						}
 					}
 
 					return $init;
