@@ -763,7 +763,7 @@
 						return $val1;
 					}
 
-					return null;
+					return $val3;
 				})(...$args);
 			}
 
