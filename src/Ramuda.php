@@ -571,6 +571,23 @@
 				})(...$args);
 			}
 
+			/**
+			 * Returns a curried "reference" to a class method. Similar to "invoker" but
+			 * returned function does not require the instance to be passed as an argument.
+			 * Useful because PHP class methods can't be called by reference.
+			 *
+			 * @internal Function
+			 * @param object $instance - a class instance
+			 * @param string $method - the method name
+			 * @param int $arity - the class method arity
+			 * @return Closure
+			 */
+			public static function methodRef($instance, $method, $arity){
+				return static::curryN($arity, function(...$xs) use ($instance, $method, $arity){
+					return call_user_func_array(array($instance, $method), $xs);
+				});
+			}
+
 			/*
 			 * OMITTED
 			 * reason: not sure if possible in PHP. Arity mismatch throws ArgumentCountError.
