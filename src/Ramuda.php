@@ -426,8 +426,7 @@
 			 */
 			public static function emptyVal(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						return [];
@@ -629,6 +628,21 @@
 			public static function of(...$args){
 				return static::curryN(1, function($x){
 					return [$x];
+				})(...$args);
+			}
+
+			/**
+			 * @internal Function
+			 * @link https://ramdajs.com/docs/#on
+			 * @param callable $f1
+			 * @param callable $f2
+			 * @param mixed $x
+			 * @param mixed $y
+			 * @return Closure|array
+			 */
+			public static function on(...$args){
+				return static::curryN(4, function($f1, $f2, $x, $y){
+					return $f1($f2($x), $f2($y));
 				})(...$args);
 			}
 
@@ -1076,6 +1090,44 @@
 
 			/**
 			 * @internal List
+			 * @link https://ramdajs.com/docs/#collectBy
+			 * @param callable $f
+			 * @param object[]|array[] $arr
+			 * @return Closure
+			 */
+			public static function collectBy(...$args){
+				return static::curryN(2, function($f, $arr){
+					if(array_key_exists(0, $arr)){
+						$type = gettype($arr[0]);
+
+						if($type === 'array' || $type === 'object'){
+							$group = array_reduce($arr, function($acc, $x) use ($f){
+								$tag = $f($x);
+
+								if(!isset($acc[$tag])){
+									$acc[$tag] = [];
+								}
+
+								$acc[$tag][] = $x;
+								return $acc;
+							}, []);
+
+							$newList = [];
+
+							foreach($group as $val){
+								$newList[] = $val;
+							}
+
+							return $newList;
+						}
+					}
+
+					return $arr;
+				})(...$args);
+			}
+
+			/**
+			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.compact
 			 * @param array $arr
 			 * @return Closure
@@ -1097,10 +1149,8 @@
 			 */
 			public static function concat(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $xType */
-					$xType = static::type($x);
-					/** @var string $yType */
-					$yType = static::type($y);
+					$xType = gettype($x);
+					$yType = gettype($y);
 
 					if($xType === $yType && $xType === 'string'){
 						return $x . $y;
@@ -1109,7 +1159,7 @@
 						return array_merge($x, $y);
 					}
 					else{
-						return null;
+						throw new Exception('Arguments must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1165,10 +1215,8 @@
 			 */
 			public static function concatRight(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $xType */
-					$xType = static::type($x);
-					/** @var string $yType */
-					$yType = static::type($y);
+					$xType = gettype($x);
+					$yType = gettype($y);
 
 					if($xType === $yType && $xType === 'string'){
 						return $y . $x;
@@ -1177,7 +1225,7 @@
 						return array_merge($y, $x);
 					}
 					else{
-						return null;
+						throw new Exception('Arguments must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1218,8 +1266,7 @@
 			 */
 			public static function drop(...$args){
 				return static::curryN(2, function($count, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return substr($x, $count, strlen($x));
@@ -1228,7 +1275,7 @@
 						return array_slice($x, $count);
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1242,8 +1289,7 @@
 			 */
 			public static function dropLast(...$args){
 				return static::curryN(2, function($count, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return substr($x, 0, strlen($x) - $count);
@@ -1252,7 +1298,7 @@
 						return array_slice($x, 0, $count + 1);
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1266,8 +1312,7 @@
 			 */
 			public static function dropLastWhile(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						$p = static::pipe('strrev', static::dropWhile($pred), 'strrev');
@@ -1278,7 +1323,7 @@
 						return $p($x);
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1335,8 +1380,7 @@
 			 */
 			public static function dropWhile(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					$unsetTil = function($arr) use ($pred){
 						foreach($arr as $key => $value){
@@ -1360,7 +1404,7 @@
 						return $p($x);
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "string" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1403,8 +1447,7 @@
 			 */
 			public static function endsWith(...$args){
 				return static::curryN(2, function($val, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return substr($x, -1) === $val;
@@ -1413,7 +1456,7 @@
 						return end($x) === $val;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -1438,8 +1481,7 @@
 			 */
 			public static function filter(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						/**@var array $str */
@@ -1463,7 +1505,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string", "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -1712,8 +1754,7 @@
 			 */
 			public static function includes(...$args){
 				return static::curryN(2, function($searchFor, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return strpos($x, $searchFor) !== false;
@@ -1725,7 +1766,7 @@
 						return property_exists($x, $searchFor);
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "string", "object" or "array" type.');
 					}
 				})(...$args);
 			}
@@ -1899,8 +1940,7 @@
 			 */
 			public static function length(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return strlen($x);
@@ -1914,7 +1954,7 @@
 						return count($keys);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string", "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2038,8 +2078,7 @@
 			 */
 			public static function map(...$args){
 				return static::curryN(2, function($mapper, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						$result = [];
@@ -2077,7 +2116,7 @@
 						return static::join('', $result);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string", "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2090,8 +2129,7 @@
 			 */
 			public static function mapIndexed(...$args){
 				return static::curryN(2, function($mapper, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						$result = [];
@@ -2114,7 +2152,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2286,8 +2324,7 @@
 			 */
 			public static function nth(...$args){
 				return static::curryN(2, function($index, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						$sub = substr($x, $index, 1);
@@ -2298,7 +2335,7 @@
 						return ($index < 0) ? $x[$index + count($x)] : $x[$index];
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2346,8 +2383,7 @@
 			 */
 			public static function partition(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$trueObj = new stdClass();
@@ -2380,7 +2416,7 @@
 						return [$trueArr, $falseArr];
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2486,8 +2522,7 @@
 			 */
 			public static function reduce(...$args){
 				return static::curryN(3, function($reducer, $defaultVal, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object' || $type === 'array' || $type === 'string'){
 						$arr = ($type === 'string') ? str_split($x) : $x;
@@ -2500,7 +2535,7 @@
 						return $acc;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string", "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2540,8 +2575,7 @@
 			 */
 			public static function reduceRight(...$args){
 				return static::curryN(3, function($reducer, $defaultVal, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$reducee = null;
 
 					if($type === 'object'){
@@ -2562,13 +2596,12 @@
 			 * @param callable $pred - Takes acc and val args.
 			 * @param callable $reducer
 			 * @param mixed $defaultVal
-			 * @param mixed $x
+			 * @param array|object $x
 			 * @return Closure
 			 */
 			public static function reduceWhile(...$args){
 				return static::curryN(4, function($pred, $reducer, $defaultVal, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$objAcc = $defaultVal;
@@ -2597,7 +2630,7 @@
 						return $arrAcc;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -2666,8 +2699,7 @@
 			 */
 			public static function remove(...$args){
 				return static::curryN(3, function($start, $count, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						/** @var array $copy */
@@ -2684,7 +2716,7 @@
 						return static::join('', $strArr);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2764,8 +2796,7 @@
 			 */
 			public static function slice(...$args){
 				return static::curryN(3, function($from, $to, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						return array_slice($x, $from, $to);
@@ -2775,7 +2806,7 @@
 						return $sub === false ? '' : $sub;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2840,8 +2871,7 @@
 			 */
 			public static function splitAt(...$args){
 				return static::curryN(2, function($index, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						return [array_slice($x, 0, $index), array_slice($x, $index, count($x))];
@@ -2855,7 +2885,7 @@
 						return [$sub1, $sub2];
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2868,11 +2898,10 @@
 			 */
 			public static function splitEvery(...$args){
 				return static::curryN(2, function($length, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type !== 'array' && $type !== 'string'){
-						return null;
+						throw new Exception('Argument "$x" must be of "string" or "array" type.');
 					}
 
 					$result = [];
@@ -2905,8 +2934,7 @@
 			 */
 			public static function splitWhen(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					/**@var array $arr */
 					$arr = $x;
 
@@ -2922,7 +2950,7 @@
 						}
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2935,8 +2963,7 @@
 			 */
 			public static function startsWith(...$args){
 				return static::curryN(2, function($prefix, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						$len = strlen($prefix);
@@ -2947,7 +2974,7 @@
 						return static::equals($prefix, static::take($len, $x));
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2959,8 +2986,7 @@
 			 */
 			public static function tail(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return static::slice(1, strlen($x), $x);
@@ -2969,7 +2995,7 @@
 						return array_slice($x, 1);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -2982,8 +3008,7 @@
 			 */
 			public static function take(...$args){
 				return static::curryN(2, function($count, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return substr($x, 0, $count);
@@ -2992,7 +3017,7 @@
 						return array_slice($x, 0, $count);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -3005,8 +3030,7 @@
 			 */
 			public static function takeLast(...$args){
 				return static::curryN(2, function($count, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'string'){
 						return substr($x, 0 - $count, $count);
@@ -3015,7 +3039,7 @@
 						return array_slice($x, 0 - $count, $count);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -3028,8 +3052,7 @@
 			 */
 			public static function takeLastWhile(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					/**@var array $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
 
@@ -3049,7 +3072,7 @@
 						return ($type === 'string') ? static::join('', $results) : $results;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -3062,8 +3085,7 @@
 			 */
 			public static function takeWhile(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					/** @var array|string $y */
 					$y = ($type === 'string') ? static::split('', $x) : $x;
 
@@ -3082,7 +3104,7 @@
 						return ($type === 'string') ? static::join('', $results) : $results;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "string" or "array" type.');
 				})(...$args);
 			}
 
@@ -4193,8 +4215,7 @@
 			 */
 			public static function assoc(...$args){
 				return static::curryN(3, function($key, $val, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						$result = static::arrayClone($x);
@@ -4207,7 +4228,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4221,8 +4242,7 @@
 			 */
 			public static function assocPath(...$args){
 				return static::curryN(3, function($keys, $val, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						$result = static::arrayClone($x);
@@ -4231,7 +4251,7 @@
 						$result = clone $x;
 					}
 					else{
-						return null;
+						throw new Exception('Argument "$x" must be of "object" or "array" type.');
 					}
 
 					$current = &$result;
@@ -4265,8 +4285,7 @@
 			 */
 			public static function dissoc(...$args){
 				return static::curryN(2, function($key, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						/** @var array $result */
@@ -4280,7 +4299,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4293,8 +4312,7 @@
 			 */
 			public static function dissocPath(...$args){
 				return static::curryN(2, function($keys, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'array'){
 						/** @var array $result */
@@ -4330,7 +4348,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4356,10 +4374,8 @@
 			 */
 			public static function eqProps(...$args){
 				return static::curryN(3, function($key, $x, $y){
-					/** @var string $type1 */
-					$type1 = static::type($x);
-					/** @var string $type2 */
-					$type2 = static::type($y);
+					$type1 = gettype($x);
+					$type2 = gettype($y);
 
 					if($type1 === 'array' && $type2 === 'array'){
 						return $x[$key] === $y[$key];
@@ -4448,8 +4464,7 @@
 			 */
 			public static function has(...$args){
 				return static::curryN(2, function($key, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						return isset($x->$key);
@@ -4477,8 +4492,7 @@
 			 */
 			public static function hasPath(...$args){
 				return static::curryN(2, function($path, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$counter = 0;
 
 					if($type === 'object'){
@@ -4492,8 +4506,7 @@
 					}
 
 					foreach($path as $key){
-						/** @var string $propType */
-						$propType = static::type($subObject);
+						$propType = gettype($subObject);
 
 						if(static::has($key, $subObject) === true){
 							$counter++;
@@ -4524,8 +4537,7 @@
 				return static::curryN(1, function($x){
 					/** @var array|object $props */
 					$props = static::keys($x);
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$len = count($props);
 					$idx = 0;
 					$out = null;
@@ -4567,8 +4579,7 @@
 				return static::curryN(1, function($x){
 					/** @var array $props */
 					$props = static::keys($x);
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$len = count($props);
 					$idx = 0;
 
@@ -4597,7 +4608,7 @@
 						return $out;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4608,8 +4619,7 @@
 			 */
 			public static function keys(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						return array_keys((array)$x);
@@ -4618,7 +4628,7 @@
 						return array_keys($x);
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4689,8 +4699,7 @@
 			 */
 			public static function mapObjIndexed(...$args){
 				return static::curryN(2, function($mapper, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$result = new stdClass();
@@ -4711,7 +4720,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4724,10 +4733,8 @@
 			 */
 			public static function merge(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $type1 */
-					$type1 = static::type($x);
-					/** @var string $type2 */
-					$type2 = static::type($y);
+					$type1 = gettype($x);
+					$type2 = gettype($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
 						return (object)array_merge((array)$x, (array)$y);
@@ -4736,7 +4743,7 @@
 						return array_merge($x, $y);
 					}
 
-					return null;
+					throw new Exception('Arguments "$x" and "$y" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4816,10 +4823,8 @@
 			 */
 			public static function mergeLeft(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $type1 */
-					$type1 = static::type($x);
-					/** @var string $type2 */
-					$type2 = static::type($y);
+					$type1 = gettype($x);
+					$type2 = gettype($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
 						return (object)array_merge((array)$y, (array)$x);
@@ -4828,7 +4833,7 @@
 						return array_merge($y, $x);
 					}
 
-					return null;
+					throw new Exception('Arguments "$x" and "$y" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4871,10 +4876,8 @@
 			 */
 			public static function mergeWithKey(...$args){
 				return static::curryN(3, function($f, $x, $y){
-					/** @var string $type1 */
-					$type1 = static::type($x);
-					/** @var string $type2 */
-					$type2 = static::type($y);
+					$type1 = gettype($x);
+					$type2 = gettype($y);
 
 					if($type1 === 'object' && $type2 === 'object'){
 						$result = new stdClass();
@@ -4911,7 +4914,7 @@
 						return $result;
 					}
 
-					return null;
+					throw new Exception('Arguments "$x" and "$y" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -4972,8 +4975,7 @@
 			 */
 			public static function omit(...$args){
 				return static::curryN(2, function($keys, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$newObj = clone $x;
@@ -4995,7 +4997,7 @@
 						return $newArr;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5008,8 +5010,7 @@
 			 */
 			public static function omitBy(...$args){
 				return static::curryN(2, function($f, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$newObj = clone $x;
@@ -5037,7 +5038,7 @@
 						return $newArr;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5069,8 +5070,7 @@
 							return null;
 						}
 
-						/** @var string $type */
-						$type = static::type($acc);
+						$type = gettype($acc);
 
 						if($type === 'array'){
 							return array_key_exists($x, $acc) ? $acc[$x] : null;
@@ -5127,8 +5127,7 @@
 			 */
 			public static function pick(...$args){
 				return static::curryN(2, function($keys, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$newObj = new stdClass();
@@ -5153,7 +5152,7 @@
 						return $newArr;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5167,8 +5166,7 @@
 			 */
 			public static function pickAll(...$args){
 				return static::curryN(3, function($keys, $defaultVal, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$newObj = new stdClass();
@@ -5189,7 +5187,7 @@
 						return $newArr;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5202,8 +5200,7 @@
 			 */
 			public static function pickBy(...$args){
 				return static::curryN(2, function($pred, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						$newObj = new stdClass();
@@ -5230,7 +5227,7 @@
 						return $newArr;
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5243,19 +5240,17 @@
 			 */
 			public static function project(...$args){
 				return static::curryN(2, function($props, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type !== 'array'){
-						return null;
+						throw new Exception('Argument "$x" must be of "array" type.');
 					}
 
 					if(empty($x)){
 						return [];
 					}
 
-					/** @var string $type0 */
-					$type0 = static::type($x[0]);
+					$type0 = gettype($x[0]);
 					$results = [];
 
 					if($type0 === 'object'){
@@ -5294,8 +5289,7 @@
 			 */
 			public static function prop(...$args){
 				return static::curryN(2, function($key, $x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object'){
 						return static::has($key, $x) ? $x->$key : null;
@@ -5304,7 +5298,7 @@
 						return $x[$key];
 					}
 
-					return null;
+					throw new Exception('Argument "$x" must be of "object" or "array" type.');
 				})(...$args);
 			}
 
@@ -5363,8 +5357,7 @@
 			 */
 			public static function toPairs(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$keys = static::keys($x);
 					$results = [];
 
@@ -5411,6 +5404,33 @@
 
 			/**
 			 * @internal Object
+			 * @link https://ramdajs.com/docs/#unwind
+			 * @param string $key
+			 * @param object|array $x
+			 * @return Closure
+			 */
+			public static function unwind(...$args){
+				return static::curryN(2, function($key, $x){
+					$type = gettype($x);
+
+					if($type === 'array' && array_key_exists($key, $x) && is_array($x[$key])){
+						$arr = $x[$key];
+					}
+					elseif($type === 'object' && property_exists($x, $key) && is_array($x->{$key})){
+						$arr = $x->{$key};
+					}
+					else{
+						return [$x];
+					}
+
+					return array_map(function($y) use ($key, $x){
+						return static::assoc($key, $y, $x);
+					}, $arr);
+				})(...$args);
+			}
+
+			/**
+			 * @internal Object
 			 * @link https://ramdajs.com/docs/#values
 			 * @param object|array $x
 			 * @return Closure
@@ -5418,7 +5438,7 @@
 			public static function values(...$args){
 				return static::curryN(1, function($x){
 					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$keys = static::keys($x);
 					$results = [];
 
@@ -5465,8 +5485,7 @@
 			 */
 			public static function where(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$keys = static::keys($x);
 
 					if($type === 'object'){
@@ -5543,8 +5562,7 @@
 			 */
 			public static function whereEq(...$args){
 				return static::curryN(2, function($x, $y){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 					$keys = static::keys($x);
 
 					if($type === 'object'){
@@ -6450,8 +6468,7 @@
 			 */
 			public static function toString(...$args){
 				return static::curryN(1, function($x){
-					/** @var string $type */
-					$type = static::type($x);
+					$type = gettype($x);
 
 					if($type === 'object' || $type === 'array'){
 						return json_encode($x);
@@ -6791,8 +6808,7 @@
 			public static function toType(...$args){
 				return static::curryN(2, function($type, $val){
 					$copy = $val;
-					/** @var string $valType */
-					$valType = static::type($val);
+					$valType = gettype($val);
 
 					if($valType === 'object'){
 						$copy = clone $val;
