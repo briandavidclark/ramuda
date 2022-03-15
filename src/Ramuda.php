@@ -3572,8 +3572,8 @@
 			 */
 			public static function cond(...$pairs){
 				return function($val) use ($pairs){
-					return array_reduce($pairs, function($acc, $fArr) use ($val){
-						return ($acc === null && $fArr[0]($val) === true) ? $fArr[1]($val) : $acc;
+					return array_reduce($pairs, function($acc, $fs) use ($val){
+						return ($acc === null && $fs[0]($val) === true) ? $fs[1]($val) : $acc;
 					}, null);
 				};
 			}
