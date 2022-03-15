@@ -3567,12 +3567,12 @@
 			/**
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#cond
-			 * @param callable[] ...$args
+			 * @param array[] ...$pairs
 			 * @return Closure
 			 */
-			public static function cond(...$args){
-				return function($val) use ($args){
-					return array_reduce($args, function($acc, $fArr) use ($val){
+			public static function cond(...$pairs){
+				return function($val) use ($pairs){
+					return array_reduce($pairs, function($acc, $fArr) use ($val){
 						return ($acc === null && $fArr[0]($val) === true) ? $fArr[1]($val) : $acc;
 					}, null);
 				};
