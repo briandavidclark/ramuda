@@ -346,8 +346,7 @@
 			 * @throws ReflectionException
 			 */
 			public static function curry($f){
-				$r = new ReflectionFunction($f);
-				return static::curryN($r->getNumberOfParameters(), $f);
+				return static::curryN(static::_getArgCount($f), $f);
 			}
 
 			/**
@@ -580,12 +579,12 @@
 			 * Useful because PHP class methods can't be called by reference.
 			 *
 			 * @internal Function
+			 * @param int $arity - the class method arity
 			 * @param object $instance - a class instance
 			 * @param string $method - the method name
-			 * @param int $arity - the class method arity
 			 * @return Closure
 			 */
-			public static function methodRef($instance, $method, $arity){
+			public static function methodRef($arity, $instance, $method){
 				return static::curryN($arity, function(...$xs) use ($instance, $method, $arity){
 					return call_user_func_array(array($instance, $method), $xs);
 				});
@@ -6811,6 +6810,21 @@
 
 			//<editor-fold desc="__INTERNAL__">
 
+			/**
+			 * @param $f
+			 * @return int
+			 * @throws Exception
+			 */
+			private static function _getArgCount($f){
+				return (new ReflectionFunction($f))->getNumberOfRequiredParameters();
+			}
+
+			/**
+			 * @param $pred
+			 * @param $x
+			 * @param $list
+			 * @return bool
+			 */
 			private static function _includesWith($pred, $x, $list){
 				$i = 0;
 				$l = count($list);
