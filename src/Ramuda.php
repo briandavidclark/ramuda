@@ -1144,24 +1144,27 @@
 			/**
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#concat
-			 * @param string|array $x
-			 * @param string|array $y
+			 * @param mixed $x
+			 * @param mixed $y
 			 * @return Closure
 			 */
 			public static function concat(...$args){
 				return static::curryN(2, function($x, $y){
+					$validTypes = ['string', 'boolean', 'integer', 'double', 'NULL'];
 					$xType = gettype($x);
 					$yType = gettype($y);
 
-					if($xType === $yType && $xType === 'string'){
-						return $x . $y;
-					}
-					elseif($xType === $yType && $xType === 'array'){
+					if($xType === 'array' && $yType === 'array'){
 						return array_merge($x, $y);
 					}
-					else{
-						throw new Exception('Arguments must be of "string" or "array" type.');
+					elseif(
+						(in_array($xType, $validTypes, true) || method_exists($x, '__toString')) &&
+						(in_array($yType, $validTypes, true) || method_exists($y, '__toString'))
+					){
+						return $x . $y;
 					}
+
+					throw new Exception('Arguments cannot be coerced to type `string`.');
 				})(...$args);
 			}
 
