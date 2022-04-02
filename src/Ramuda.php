@@ -5863,7 +5863,11 @@
 			 */
 			public static function isEven(...$args){
 				return static::curryN(1, function($x){
-					return $x % 2 === 0;
+					if(is_numeric($x) && gettype($x) !== 'string'){
+						return $x % 2 === 0;
+					}
+
+					return false;
 				})(...$args);
 			}
 
@@ -5875,7 +5879,11 @@
 			 */
 			public static function isOdd(...$args){
 				return static::curryN(1, function($x){
-					return $x % 2 !== 0;
+					if(is_numeric($x) && gettype($x) !== 'string'){
+						return $x % 2 !== 0;
+					}
+
+					return false;
 				})(...$args);
 			}
 
