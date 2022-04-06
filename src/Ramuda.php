@@ -6564,7 +6564,7 @@
 			 */
 			public static function isBoolean(...$args){
 				return static::curryN(1, function($val){
-					return static::isType($val) === 'boolean';
+					return gettype($val) === 'boolean';
 				})(...$args);
 			}
 
