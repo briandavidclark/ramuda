@@ -3635,6 +3635,7 @@
 			//<editor-fold desc="LOGGING">
 
 			/**
+			 * Useful for insertion into a `R::pipe` function.
 			 * @internal Logging
 			 * @param mixed $x
 			 * @return Closure
@@ -3648,6 +3649,7 @@
 			}
 
 			/**
+			 * Useful for insertion into a `R::pipe` function.
 			 * @internal Logging
 			 * @param mixed $x
 			 * @return Closure
@@ -3661,6 +3663,7 @@
 			}
 
 			/**
+			 * Useful for insertion into a `R::pipe` function.
 			 * @internal Logging
 			 * @param mixed $x
 			 * @return Closure
