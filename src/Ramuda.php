@@ -4429,6 +4429,7 @@
 			//<editor-fold desc="OBJECT">
 
 			/**
+			 * Makes a shallow clone of an `object` or associative `array`, setting or overriding the specified property with the given value. All non-primitive properties are copied by reference.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#assoc
 			 * @param string $key
@@ -4456,6 +4457,7 @@
 			}
 
 			/**
+			 * Makes a shallow clone of an `object` or associative `array`, setting or overriding the nodes required to create the given path, and placing the specific value at the tail end of that path. All non-primitive properties are copied by reference.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#assocPath
 			 * @param string[] $keys
@@ -4500,6 +4502,7 @@
 			}
 
 			/**
+			 * Returns a copy of `$x` that does not contain a `$key` property.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#dissoc
 			 * @param string $key
@@ -4526,6 +4529,7 @@
 			}
 
 			/**
+			 * Makes a shallow clone of an `object` or associative `array`, omitting the property at the given path. All non-primitive properties are copied by reference.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#dissocPath
 			 * @param string[] $keys
@@ -4574,6 +4578,7 @@
 			}
 
 			/**
+			 * Creates a deep copy of the source that can be used in place of the source object without retaining any references to it.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#clone
 			 * @param mixed $x
@@ -4586,6 +4591,7 @@
 			}
 
 			/**
+			 * Reports whether two items have the same value, in `R::equals` terms, for the specified property. Useful as a curried predicate.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#eqProps
 			 * @param string $key
@@ -4610,6 +4616,7 @@
 			}
 
 			/**
+			 * Creates a new `object` or associative `array` by recursively evolving a shallow copy of `$x`, according to the transformation functions. All non-primitive properties are copied by reference. A transformation function will not be invoked if its corresponding key does not exist in the evolved object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#evolve
 			 * @param object|array $xfs
@@ -4660,6 +4667,7 @@
 			}
 
 			/**
+			 * Iterterate over an input `object` or associative `array`, calling a provided function `$f` for each key and value in the object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#forEachObjIndexed
 			 * @param string $f
@@ -4677,6 +4685,7 @@
 			}
 
 			/**
+			 * Returns whether an `object` or associative `array` has a property with the specified name.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#has
 			 * @param string $key
@@ -4705,6 +4714,7 @@
 			 */
 
 			/**
+			 * Returns whether a path exists on an `object` or associative `array`.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#hasPath
 			 * @param string[] $path
@@ -4749,6 +4759,7 @@
 			}
 
 			/**
+			 * Same as `R::invertObj`, however this accounts for `objects` with duplicate values by putting the values into an `array`.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#invert
 			 * @param object|array $x
@@ -4791,6 +4802,8 @@
 			}
 
 			/**
+			 * Returns a new `object` or associative `array` with the keys of the given object as values, and the values of the given object, which are coerced to a `string`, as keys.
+			 * NOTE: the last key found is preferred when handling the same value.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#invertObj
 			 * @param object|array $x
@@ -4834,6 +4847,7 @@
 			}
 
 			/**
+			 * Returns the keys of an `object` or associative `array`.
 			 * @internal Object
 			 * @param object|array $x
 			 * @return Closure
@@ -4860,6 +4874,7 @@
 			 */
 
 			/**
+			 * Returns a lens for the given getter and setter functions. The getter "gets" the value of the focus; the setter "sets" the value of the focus. The setter should not mutate the data structure.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#lens
 			 * @param callable $getter
@@ -4876,6 +4891,7 @@
 			}
 
 			/**
+			 * Returns a lens whose focus is the specified index.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#lensIndex
 			 * @param int $x
@@ -4888,6 +4904,7 @@
 			}
 
 			/**
+			 * Returns a lens whose focus is the specified path.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#lensPath
 			 * @param array $x
@@ -4900,6 +4917,7 @@
 			}
 
 			/**
+			 * Returns a lens whose focus is the specified property.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#lensProp
 			 * @param string $x
@@ -4912,6 +4930,7 @@
 			}
 
 			/**
+			 * An Object-specific version of map. The function is applied to three arguments: `($value, $key, $obj)`. If only the value is significant, use `R::map` instead.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mapObjIndexed
 			 * @param callable $mapper
@@ -4946,29 +4965,9 @@
 			}
 
 			/**
-			 * @internal Object
-			 * @link https://ramdajs.com/docs/#merge
-			 * @param object|array $x
-			 * @param object|array $y
-			 * @return Closure
-			 */
-			public static function merge(...$args){
-				return static::curryN(2, function($x, $y){
-					$type1 = gettype($x);
-					$type2 = gettype($y);
-
-					if($type1 === 'object' && $type2 === 'object'){
-						return (object)array_merge((array)$x, (array)$y);
-					}
-					elseif($type1 === 'array' && $type2 === 'array'){
-						return array_merge($x, $y);
-					}
-
-					throw new Exception('Arguments "$x" and "$y" must be of "object" or "array" type.');
-				})(...$args);
-			}
-
-			/**
+			 * Creates a new object with the own properties of the first object merged with the own properties of the second object. If a key exists in both objects:
+			 * 1. and both values are objects, the two values will be recursively merged
+			 * 2. otherwise the value from the first object will be used.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeDeepLeft
 			 * @param object $x
@@ -4984,6 +4983,9 @@
 			}
 
 			/**
+			 * Creates a new object with the own properties of the first object merged with the own properties of the second object. If a key exists in both objects:
+			 * 1. and both values are objects, the two values will be recursively merged
+			 * 2. otherwise the value from the second object will be used.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeDeepRight
 			 * @param object $x
@@ -4999,6 +5001,9 @@
 			}
 
 			/**
+			 * Creates a new object with the own properties of the two provided objects. If a key exists in both objects:
+			 * 1. and both associated values are also objects then the values will be recursively merged.
+			 * 2. otherwise the provided function is applied to associated values using the resulting value as the new value associated with the key. If a key only exists in one object, the value will be associated with the key of the resulting object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeDeepWith
 			 * @param callable $f
@@ -5015,6 +5020,9 @@
 			}
 
 			/**
+			 * Creates a new object with the own properties of the two provided objects. If a key exists in both objects:
+			 * 1. and both associated values are also objects then the values will be recursively merged.
+			 * 2. otherwise the provided function is applied to the key and associated values using the resulting value as the new value associated with the key. If a key only exists in one object, the value will be associated with the key of the resulting object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeDeepWithKey
 			 * @param callable $f
@@ -5036,6 +5044,7 @@
 			}
 
 			/**
+			 * Create a new object with the own properties of the first object merged with the own properties of the second object. If a key exists in both objects, the value from the first object will be used.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeLeft
 			 * @param object|array $x
@@ -5059,6 +5068,7 @@
 			}
 
 			/**
+			 * Create a new object with the own properties of the first object merged with the own properties of the second object. If a key exists in both objects, the value from the second object will be used.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeRight
 			 * @param object|array $x
@@ -5067,11 +5077,12 @@
 			 */
 			public static function mergeRight(...$args){
 				return static::curryN(2, function($x, $y){
-					return static::merge($x, $y);
+					return static::_merge($x, $y);
 				})(...$args);
 			}
 
 			/**
+			 * Creates a new object with the own properties of the two provided objects. If a key exists in both objects, the provided function is applied to the values associated with the key in each object, with the result being used as the value associated with the key in the returned object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeWith
 			 * @param callable $f
@@ -5088,6 +5099,7 @@
 			}
 
 			/**
+			 * Creates a new object with the own properties of the two provided objects. If a key exists in both objects, the provided function is applied to the key and the values associated with the key in each object, with the result being used as the value associated with the key in the returned object.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#mergeWithKey
 			 * @param callable $f
@@ -5140,6 +5152,7 @@
 			}
 
 			/**
+			 * Creates a copy of the passed object by applying `$f` function to the given prop property. The function will not be invoked, and the object will not change if its corresponding property does not exist in the object. All non-primitive properties are copied to the new object by reference.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#modify
 			 * @param string|int $key
@@ -5154,6 +5167,7 @@
 			}
 
 			/**
+			 * Creates a shallow clone of the passed object by applying `$f` function to the value at the given path. The function will not be invoked, and the object will not change if its corresponding path does not exist in the object. All non-primitive properties are copied to the new object by reference.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#modifyPath
 			 * @param array $path
@@ -5175,6 +5189,7 @@
 			}
 
 			/**
+			 * Creates an `object` containing a single `key:value` pair.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#objOf
 			 * @param string $key
@@ -5188,6 +5203,7 @@
 			}
 
 			/**
+			 * Returns a partial copy of an `object` omitting the keys specified.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#omit
 			 * @param array $keys
@@ -5222,6 +5238,7 @@
 			}
 
 			/**
+			 * Returns a partial copy of an `object` containing only the keys that don't satisfy the supplied predicate.
 			 * @internal Object
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.omitBy
 			 * @param callable $f
@@ -5262,6 +5279,7 @@
 			}
 
 			/**
+			 * Returns the result of "setting" the portion of the given data structure focused by the given lens to the result of applying the given function to the focused value.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#over
 			 * @param object $lens
@@ -5276,6 +5294,7 @@
 			}
 
 			/**
+			 * Retrieve the value at a given path.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#path
 			 * @param string[] $path
@@ -5305,6 +5324,7 @@
 			}
 
 			/**
+			 * Retrieves the values at given paths of an `object`.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#paths
 			 * @param string[] $paths
@@ -5324,6 +5344,7 @@
 			}
 
 			/**
+			 * If the given, non-null `object` has a value at the given path, returns the value at that path. Else, returns the provided default value.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#pathOr
 			 * @param mixed $val
@@ -5338,6 +5359,7 @@
 			}
 
 			/**
+			 * Returns a partial copy of an `object` containing only the keys specified. If the key does not exist, the property is ignored..
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#pick
 			 * @param string[] $keys
@@ -5376,6 +5398,7 @@
 			}
 
 			/**
+			 * Similar to pick except that this one includes a key: undefined pair for properties that don't exist.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#pickAll
 			 * @param string[] $keys
@@ -5411,6 +5434,7 @@
 			}
 
 			/**
+			 * Returns a partial copy of an `object` containing only the keys that satisfy the supplied predicate.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#pickBy
 			 * @param callable $pred
@@ -5451,6 +5475,7 @@
 			}
 
 			/**
+			 * Reasonable analog to SQL `select` statement.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#project
 			 * @param string[] $props
@@ -5500,6 +5525,7 @@
 			}
 
 			/**
+			 * Returns a function that when supplied an object returns the indicated property of that object, if it exists.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#prop
 			 * @param string $key
@@ -5514,7 +5540,7 @@
 						return static::has($key, $x) ? $x->$key : null;
 					}
 					elseif($type === 'array'){
-						return $x[$key];
+						return array_key_exists($key, $x) ? $x[$key] : null;
 					}
 
 					throw new Exception('Argument "$x" must be of "object" or "array" type.');
@@ -5522,6 +5548,7 @@
 			}
 
 			/**
+			 * Return the specified property of the given non-null object if the property is present, and it's value is not null. Else, the first argument is returned.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#propOr
 			 * @param string $val
@@ -5540,6 +5567,7 @@
 			}
 
 			/**
+			 * Acts as multiple `prop: array` of keys in, `array` of values out. Preserves order.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#props
 			 * @param string[] $keys
@@ -5555,6 +5583,7 @@
 			}
 
 			/**
+			 * Returns the result of "setting" the portion of the given data structure focused by the given lens to the given value.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#set
 			 * @param object $lens
@@ -5569,6 +5598,7 @@
 			}
 
 			/**
+			 * Converts an `object` into an `array` of `[key, value]` arrays.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#toPairs
 			 * @param object|array $x
@@ -5596,6 +5626,7 @@
 			}
 
 			/**
+			 * Creates array of entries from `object`.
 			 * @internal Object
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toEntries
 			 * @param object|array $obj
@@ -5622,6 +5653,7 @@
 			 */
 
 			/**
+			 * Deconstructs an `array` field from the input documents to output a document for each element. Each output document is the input document with the value of the `array` field replaced by the element.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#unwind
 			 * @param string $key
@@ -5649,6 +5681,7 @@
 			}
 
 			/**
+			 * Returns a list of all the enumerable properties of the supplied `object`.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#values
 			 * @param object|array $x
@@ -5682,6 +5715,7 @@
 			 */
 
 			/**
+			 * Returns a "view" of the given data structure, determined by the given lens. The lens's focus determines which portion of the data structure is visible.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#view
 			 * @param object $lens
@@ -5695,6 +5729,7 @@
 			}
 
 			/**
+			 * Takes a spec `object` and a test `object`; returns `true` if the test satisfies the spec. Each of the spec's properties must be a predicate function. Each predicate is applied to the value of the corresponding property of the test `object`. `R::where` returns `true` if all the predicates return `true`, `false` otherwise.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#where
 			 * @param object|array $x
@@ -5734,6 +5769,7 @@
 			}
 
 			/**
+			 * Takes a spec object and a test `object`; each of the spec's properties must be a predicate function. Each predicate is applied to the value of the corresponding property of the test `object`. `R::whereAny` returns `true` if at least one of the predicates return `true`, `false` otherwise.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#whereAny
 			 * @param object|array $spec
@@ -5772,6 +5808,7 @@
 			}
 
 			/**
+			 * Takes a spec `object` and a test `object`; returns `true` if the test satisfies the spec, `false` otherwise. An `object` satisfies the spec if, for each of the spec's  properties, accessing that property of the `object` gives the same value (in `R::equals` terms) as accessing that property of the spec.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#whereEq
 			 * @param object|array $x
@@ -5807,6 +5844,7 @@
 			//<editor-fold desc="RELATION">
 
 			/**
+			 * Restricts a number to be within a range.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#clamp
 			 * @param int|float $min
@@ -5821,6 +5859,7 @@
 			}
 
 			/**
+			 * Counts the elements of a list according to how many match each value of a key generated by the supplied function. Returns an `object` mapping the keys produced by `$f` to the number of occurrences in the list.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#countBy
 			 * @param callable $f
@@ -5836,6 +5875,7 @@
 			}
 
 			/**
+			 * Finds the set (i.e. no duplicates) of all elements in the first list not contained in the second list. Objects and Arrays are compared in terms of value equality, not reference equality.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#difference
 			 * @param array $x
@@ -5869,6 +5909,7 @@
 			}
 
 			/**
+			 * Finds the set (i.e. no duplicates) of all elements in the first list not contained in the second list. Duplication is determined according to the value returned by applying the supplied predicate to two list elements.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#differenceWith
 			 * @param callable $f
@@ -5896,6 +5937,7 @@
 			}
 
 			/**
+			 * Takes a function and two values in its domain and returns `true` if the values map to the same value in the co-domain; `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#eqBy
 			 * @param callable $f
@@ -5910,6 +5952,7 @@
 			}
 
 			/**
+			 * Returns `true` if its arguments are equivalent, `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#equals
 			 * @param mixed $x
@@ -5923,6 +5966,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to empty `array`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToEmptyArray
 			 * @param mixed $x
@@ -5935,6 +5979,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to empty `object`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToEmptyObject
 			 * @param mixed $x
@@ -5949,6 +5994,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to empty `string`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToEmptyString
 			 * @param mixed $x
@@ -5961,6 +6007,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to `false`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToFalse
 			 * @param mixed $x
@@ -5973,6 +6020,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to `null`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToNull
 			 * @param mixed $x
@@ -5985,6 +6033,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to one.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToOne
 			 * @param mixed $x
@@ -5997,6 +6046,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to `true`.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToTrue
 			 * @param mixed $x
@@ -6009,6 +6059,7 @@
 			}
 
 			/**
+			 * Tests if argument equal to zero.
 			 * @internal Relation
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsToZero
 			 * @param mixed $x
@@ -6021,6 +6072,7 @@
 			}
 
 			/**
+			 * Returns `true` if the first argument is greater than the second; `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#gt
 			 * @param float|int $x
@@ -6034,6 +6086,7 @@
 			}
 
 			/**
+			 * Returns `true` if the first argument is greater than or equal to the second; `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#gte
 			 * @param float|int $x
@@ -6053,6 +6106,7 @@
 			 */
 
 			/**
+			 * Takes a predicate `$pred`, a list `$xs`, and a list `$ys`, and returns a list xs' comprising each of the elements of `$xs` which is equal to one or more elements of `$ys` according to `$pred`. `$pred` must be a binary function expecting an element from each list. `$xs`, `$ys`, and xs' are treated as sets, semantically, so ordering should not be significant, but since xs' is ordered the implementation guarantees that its values are in the same order as they appear in `$xs`. Duplicates are not removed, so xs' may contain duplicates if `$xs` contains duplicates.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#innerJoin
 			 * @param callable $pred
@@ -6061,14 +6115,15 @@
 			 * @return Closure
 			 */
 			public static function innerJoin(...$args){
-				return static::curryN(3, function($pred, $x, $y){
-					return static::filter(function($x) use ($pred, $y){
-						return static::_includesWith($pred, $x, $y);
-					}, $x);
+				return static::curryN(3, function($pred, $xs, $ys){
+					return static::filter(function($xs) use ($pred, $ys){
+						return static::_includesWith($pred, $xs, $ys);
+					}, $xs);
 				})(...$args);
 			}
 
 			/**
+			 * Combines two lists into a set (i.e. no duplicates) composed of those elements common to both lists.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#intersection
 			 * @param array $x
@@ -6101,8 +6156,8 @@
 			}
 
 			/**
+			 * Is number even?
 			 * @internal Relation
-			 * Is number even.
 			 * @param float|int $x
 			 * @return Closure
 			 */
@@ -6117,8 +6172,8 @@
 			}
 
 			/**
+			 * Is number odd?
 			 * @internal Relation
-			 * Is number odd.
 			 * @param float|int $x
 			 * @return Closure
 			 */
@@ -6133,6 +6188,7 @@
 			}
 
 			/**
+			 * Returns `true` if the first argument is less than the second; `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#lt
 			 * @param float|int $x
@@ -6146,6 +6202,7 @@
 			}
 
 			/**
+			 * Returns `true` if the first argument is less than or equal to the second; `false` otherwise.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#lte
 			 * @param float|int $x
@@ -6159,6 +6216,7 @@
 			}
 
 			/**
+			 * Returns the larger of its two arguments.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#max
 			 * @param float|int $x
@@ -6172,6 +6230,7 @@
 			}
 
 			/**
+			 * Takes a function and two values, and returns whichever value produces the larger result when passed to the provided function.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#maxBy
 			 * @param callable $f
@@ -6186,6 +6245,7 @@
 			}
 
 			/**
+			 * Returns the smaller of its two arguments.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#min
 			 * @param float|int $x
@@ -6199,6 +6259,7 @@
 			}
 
 			/**
+			 * Takes a function and two values, and returns whichever value produces the smaller result when passed to the provided function.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#minBy
 			 * @param callable $f
@@ -6213,6 +6274,7 @@
 			}
 
 			/**
+			 * Determines whether a nested path on an `object` has a specific value, in `R::equals` terms. Most likely used to filter a list.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#pathEq
 			 * @param string[] $path
@@ -6233,6 +6295,7 @@
 			}
 
 			/**
+			 * Determines whether a nested path on an `object` doesn't have a specific value, in `R::equals` terms. Most likely used to filter a list.
 			 * @internal Relation
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.pathNotEq
 			 * @param string[] $path
@@ -6253,6 +6316,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified object property is equal, in `R::equals` terms, to the given value; `false` otherwise. You can test multiple properties with `R::whereEq`.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#propEq
 			 * @param string $key
@@ -6268,6 +6332,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified `object` property is not equal, in `R::equals` terms, to the given value; `false` otherwise.
 			 * @internal Relation
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.propNotEq
 			 * @param string $key
@@ -6285,7 +6350,6 @@
 			/**
 			 * Performs a linear conversion between 2 ranges.
 			 * @example R::scale(0, 100, 0, 150, 50) -> 75
-			 *
 			 * @internal Relation
 			 * @param int|float $min1
 			 * @param int|float $max1
@@ -6302,6 +6366,7 @@
 			}
 
 			/**
+			 * Sorts the list according to the supplied function.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#sortBy
 			 * @param callable $f
@@ -6324,6 +6389,7 @@
 			}
 
 			/**
+			 * Sorts a list according to a list of comparators.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#sortWith
 			 * @param callable[] $fArr
@@ -6347,6 +6413,7 @@
 			}
 
 			/**
+			 * Finds the set (i.e. no duplicates) of all elements contained in the first or second list, but not both.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#symmetricDifference
 			 * @param array $arr1
@@ -6360,6 +6427,7 @@
 			}
 
 			/**
+			 * Finds the set (i.e. no duplicates) of all elements contained in the first or second list, but not both. Duplication is determined according to the value returned by applying the supplied predicate to two list elements.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#symmetricDifferenceWith
 			 * @param callable $pred
@@ -6374,6 +6442,7 @@
 			}
 
 			/**
+			 * Combines two lists into a set (i.e. no duplicates) composed of the elements of each list.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#union
 			 * @param array $arr1
@@ -6387,6 +6456,7 @@
 			}
 
 			/**
+			 * Combines two lists into a set (i.e. no duplicates) composed of the elements of each list. Duplication is determined according to the value returned by applying the supplied predicate to two list elements. If an element exists in both lists, the first element from the first list will be used.
 			 * @internal Relation
 			 * @link https://ramdajs.com/docs/#unionWith
 			 * @param callable $pred
@@ -7091,6 +7161,27 @@
 				}
 
 				return false;
+			}
+
+			/**
+			 * @param object|array $x
+			 * @param object|array $y
+			 * @return Closure
+			 */
+			private static function _merge(...$args){
+				return static::curryN(2, function($x, $y){
+					$type1 = gettype($x);
+					$type2 = gettype($y);
+
+					if($type1 === 'object' && $type2 === 'object'){
+						return (object)array_merge((array)$x, (array)$y);
+					}
+					elseif($type1 === 'array' && $type2 === 'array'){
+						return array_merge($x, $y);
+					}
+
+					throw new Exception('Arguments "$x" and "$y" must be of "object" or "array" type.');
+				})(...$args);
 			}
 
 			//</editor-fold>
