@@ -6290,17 +6290,17 @@
 			/**
 			 * Replaces an index numbered token string for each item in $replaceWith.
 			 * @internal String
-			 * @param string $str
 			 * @param string[] $replaceWith
+			 * @param string $str
 			 * @return Closure
 			 * @example R::replaceTokenStrings("last_name: {1}, first_name: {0}"), ["John", "Doe"]) => "last_name: Doe, first_name: John"
 			 */
 			public static function replaceTokenStrings(...$args){
-				return static::curryN(2, function($replaceWith, $str){
+				return static::curryN(2, function($str, $replaceWith){
 					$strCopy = $str;
 
 					for($n = 0; $n < count($replaceWith); $n++){
-						$strCopy = implode($replaceWith[$n], explode('{' . $n . '}', $strCopy));
+						$strCopy = str_replace('{' . $n . '}', $replaceWith[$n], $strCopy);
 					}
 
 					return $strCopy;
