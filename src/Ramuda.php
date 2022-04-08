@@ -6876,6 +6876,7 @@
 			//<editor-fold desc="TYPE">
 
 			/**
+			 * See if a number is between two other numbers.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#between
 			 * @param int|float $min
@@ -6894,6 +6895,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `boolean`.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isBoolean
 			 * @param mixed $val
@@ -6906,6 +6908,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `array`.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isArray
 			 * @param mixed $val
@@ -6918,6 +6921,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `float`.
 			 * @internal Type
 			 * @param mixed $val
 			 * @return Closure
@@ -6929,6 +6933,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `callable`.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isFunction
 			 * @param mixed $val
@@ -6941,6 +6946,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `int`.
 			 * @internal Type
 			 * @param mixed $val
 			 * @return Closure
@@ -6952,6 +6958,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is a negative number.
 			 * @internal Type
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.isNegative
 			 * @param int|float $x
@@ -6964,6 +6971,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `null`.
 			 * @internal Type
 			 * @link https://ramdajs.com/docs/#isNil
 			 * @param mixed $val
@@ -6976,6 +6984,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `null` or if it is empty.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isNilOrEmpty
 			 * @param mixed $val
@@ -6988,6 +6997,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is numeric.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isNumber
 			 * @param mixed $x
@@ -7000,6 +7010,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `object`.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isObject
 			 * @param mixed $val
@@ -7012,6 +7023,7 @@
 			}
 
 			/**
+			 * Checks if input value is a pair.
 			 * @internal Type
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.isPair
 			 * @param mixed $x
@@ -7024,6 +7036,7 @@
 			}
 
 			/**
+			 * Checks if value is a positive. Zero is not considered positive.
 			 * @internal Type
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.isPositive
 			 * @param int|float $x
@@ -7031,11 +7044,12 @@
 			 */
 			public static function isPositive(...$args){
 				return static::curryN(1, function($x){
-					return $x >= 0;
+					return $x > 0;
 				})(...$args);
 			}
 
 			/**
+			 * Checks if input value is a sparse `array`. An `array` with at least one "empty slot" in it is often called a "sparse array." Empty slot doesn't mean that the slot contains `null` values, but rather that the slots don't exist.
 			 * @internal Type
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.isSparseArray
 			 * @param array $arr
@@ -7048,6 +7062,7 @@
 			}
 
 			/**
+			 * Returns `true` if argument is type of `string`.
 			 * @internal Type
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isString
 			 * @param mixed $val
@@ -7060,6 +7075,7 @@
 			}
 
 			/**
+			 * See if a value is an instance of the supplied type.
 			 * @internal Type
 			 * @link https://ramdajs.com/docs/#is
 			 * @param string $type - Valid values: "boolean", "integer", "double", "string", "array", "object", "resource", "NULL", "unknown type", or "resource (closed)"
@@ -7073,6 +7089,7 @@
 			}
 
 			/**
+			 * Curried version of `isset()`.
 			 * @internal Type
 			 * @param mixed $val
 			 * @return Closure
@@ -7084,6 +7101,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified `object` property is of the given type; `false` otherwise.
 			 * @internal Type
 			 * @link https://ramdajs.com/docs/#propIs
 			 * @param string $type
@@ -7106,7 +7124,10 @@
 			 */
 			public static function toNumber(...$args){
 				return static::curryN(1, function($x){
-					if(!is_string($x)){
+					if(!is_string($x) && is_numeric($x)){
+						return $x;
+					}
+					elseif(!is_string($x)){
 						return 0;
 					}
 					elseif(strpos($x, '.') !== false){
@@ -7143,6 +7164,7 @@
 			}
 
 			/**
+			 * Curried version of `gettype()`.
 			 * @internal Type
 			 * @link https://ramdajs.com/docs/#type
 			 * @param mixed $x
