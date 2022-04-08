@@ -3681,6 +3681,7 @@
 			//<editor-fold desc="LOGIC">
 
 			/**
+			 * Takes a list of predicates and returns a predicate that returns true for a given list of arguments if every one of the provided predicates is satisfied by those arguments. The function returned is a curried function whose arity matches that of the highest-arity predicate.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#allPass
 			 * @param callable[] $preds
@@ -3700,6 +3701,7 @@
 			}
 
 			/**
+			 * Returns the first argument if it is falsy, otherwise the second argument. Acts as the `boolean` and statement if both inputs are `boolean`.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#and
 			 * @param mixed $x
@@ -3713,6 +3715,7 @@
 			}
 
 			/**
+			 * Takes a list of predicates and returns a predicate that returns true for a given list of arguments if at least one of the provided predicates is satisfied by those arguments. The function returned is a curried function whose arity matches that of the highest-arity predicate.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#anyPass
 			 * @param callable[] $preds
@@ -3732,6 +3735,7 @@
 			}
 
 			/**
+			 * A function which calls the two provided functions and returns the `&&` of the results. It returns the result of the first function if it is false-y and the result of the second function otherwise. Note that this is short-circuited, meaning that the second function will not be invoked if the first returns a false-y value.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#both
 			 * @param callable $pred1
@@ -3746,6 +3750,7 @@
 			}
 
 			/**
+			 * Takes a function `$pred` and returns a function g such that if called with the same arguments when `$pred` returns a "truthy" value, g returns `false` and when f returns a "falsy" value g returns `true`. `R::complement` may be applied to any functor.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#complement
 			 * @param callable $pred
@@ -3759,6 +3764,8 @@
 			}
 
 			/**
+			 * Returns a function, fn, which encapsulates if/else, if/else, ... logic. `R::cond` takes a list of [predicate, transformer] pairs. All the arguments to fn are applied to each of the predicates in turn until one returns a "truthy" value, at which point fn returns the result of applying its arguments to the corresponding transformer. If none of the predicates matches, fn returns `null`.
+			 * NOTE: This is not a direct substitute for a switch statement. Remember that both elements of every pair passed to cond are functions, and cond returns a function.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#cond
 			 * @param array[] ...$pairs
@@ -3773,6 +3780,7 @@
 			}
 
 			/**
+			 * Returns the second argument if it is not `null`; otherwise the first argument is returned.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#defaultTo
 			 * @param mixed $val
@@ -3786,6 +3794,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise the empty `array` is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToEmptyArray
 			 * @param mixed $x
@@ -3798,6 +3807,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise the empty `object` is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToEmptyObject
 			 * @param mixed $x
@@ -3810,6 +3820,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise the empty `string` is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToEmptyString
 			 * @param mixed $x
@@ -3822,6 +3833,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise `false` is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToFalse
 			 * @param mixed $x
@@ -3834,6 +3846,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise one is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToOne
 			 * @param mixed $x
@@ -3846,8 +3859,9 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise `true` is returned.
 			 * @internal Logic
-			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToOne
+			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToTrue
 			 * @param mixed $x
 			 * @return Closure
 			 */
@@ -3858,6 +3872,7 @@
 			}
 
 			/**
+			 * Returns the argument if it is not `null`; otherwise zero is returned.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#defaultToZero
 			 * @param mixed $x
@@ -3870,6 +3885,7 @@
 			}
 
 			/**
+			 * Returns the second argument if predicate function returns `true`, otherwise the third argument is returned.
 			 * @internal Logic
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.defaultWhen
 			 * @param callable $pred
@@ -3884,6 +3900,7 @@
 			}
 
 			/**
+			 * A function wrapping calls to the two functions in an `||` operation, returning the result of the first function if it is truth-y and the result of the second function otherwise. NOTE: this is short-circuited, meaning that the second function will not be invoked if the first returns a truth-y value.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#either
 			 * @param callable $pred1
@@ -3898,6 +3915,7 @@
 			}
 
 			/**
+			 * Creates a function that will process either the `$ifTrue` or the `$ifFalse` function depending upon the result of the condition predicate.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#ifElse
 			 * @param callable $pred
@@ -3913,6 +3931,7 @@
 			}
 
 			/**
+			 * Returns `true` if the given value is its type's empty value; `false` otherwise.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#isEmpty
 			 * @param mixed $x
@@ -3925,6 +3944,7 @@
 			}
 
 			/**
+			 * Returns `true` for falsy values.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isFalsy
 			 * @param mixed $x
@@ -3937,6 +3957,7 @@
 			}
 
 			/**
+			 * Returns `true` for truthy values.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#isTruthy
 			 * @param mixed $x
@@ -3949,6 +3970,7 @@
 			}
 
 			/**
+			 * A function which calls the two provided functions and returns the complement of `||`ing the results. It returns `false` if the first function is truth-y and the complement of the second function otherwise. Note that this is short-circuited, meaning that the second function will not be invoked if the first returns a truth-y value. In short, it will return `true` if neither predicate returns `true`.
 			 * @internal Logic
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.neither
 			 * @param callable $pred1
@@ -3963,6 +3985,7 @@
 			}
 
 			/**
+			 * Takes a list of predicates and returns a predicate that returns `true` for a given list of arguments if none of the provided predicates are satisfied by those arguments. It is the complement of `R::anyPass`. The function returned is a curried function whose arity matches that of the highest-arity predicate.
 			 * @internal Logic
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.nonePass
 			 * @param callable[] $preds
@@ -3982,6 +4005,7 @@
 			}
 
 			/**
+			 * Returns `true` if both arguments are falsy; `false` otherwise.
 			 * @internal Logic
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.nor
 			 * @param callable $pred1
@@ -3996,6 +4020,7 @@
 			}
 
 			/**
+			 * A function that returns the `!` of its argument. It will return `true` when passed false-y value, and `false` when passed a truth-y one.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#not
 			 * @param mixed $x
@@ -4008,6 +4033,7 @@
 			}
 
 			/**
+			 * Returns `true` if the arguments are not equal.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#notEqual
 			 * @param mixed $x
@@ -4021,6 +4047,7 @@
 			}
 
 			/**
+			 * Returns the first argument if it is truthy, otherwise the second argument. Acts as the `boolean` or statement if both inputs are `boolean`.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#or
 			 * @param mixed $x
@@ -4034,6 +4061,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified property at given path satisfies the given predicate; `false` otherwise.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#pathSatisfies
 			 * @param callable $pred
@@ -4050,6 +4078,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified property satisfies the given predicate; `false` otherwise. You can test multiple properties with `R::where`.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#propSatisfies
 			 * @param callable $pred
@@ -4064,6 +4093,7 @@
 			}
 
 			/**
+			 * Tests the final argument by passing it to the given predicate function. If the predicate is not satisfied, the function will return the result of calling the `$ifFalse` function with the same argument. If the predicate is satisfied, the argument is returned as is.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#unless
 			 * @param callable $pred
@@ -4078,6 +4108,7 @@
 			}
 
 			/**
+			 * Takes a predicate, a transformation function, and an initial value, and returns a value of the same type as the initial value. It does so by applying the transformation until the predicate is satisfied, at which point it returns the satisfactory value.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#until
 			 * @param callable $pred
@@ -4098,6 +4129,7 @@
 			}
 
 			/**
+			 * Tests the final argument by passing it to the given predicate function. If the predicate is satisfied, the function will return the result of calling the `$ifTrue` function with the same argument. If the predicate is not satisfied, the argument is returned as is.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#when
 			 * @param callable $pred
@@ -4112,6 +4144,7 @@
 			}
 
 			/**
+			 * Exclusive disjunction logical operation. Returns `true` if one of the arguments is truthy and the other is falsy. Otherwise, it returns `false`.
 			 * @internal Logic
 			 * @link https://ramdajs.com/docs/#xor
 			 * @param mixed $x
@@ -4129,6 +4162,7 @@
 			//<editor-fold desc="MATH">
 
 			/**
+			 * Adds two values.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#add
 			 * @param float|int $x
@@ -4142,6 +4176,7 @@
 			}
 
 			/**
+			 * Returns the smallest integer greater than or equal to a given number.
 			 * @internal Math
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.ceil
 			 * @param int|float $x
@@ -4154,6 +4189,7 @@
 			}
 
 			/**
+			 * Decrements its argument.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#dec
 			 * @param int|float $x
@@ -4166,6 +4202,7 @@
 			}
 
 			/**
+			 * Divides two numbers. Equivalent to `$x / $y`.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#divide
 			 * @param float|int $x
@@ -4179,6 +4216,7 @@
 			}
 
 			/**
+			 * Returns the largest integer less than or equal to a given number.
 			 * @internal Math
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.floor
 			 * @param int|float $x
@@ -4191,6 +4229,7 @@
 			}
 
 			/**
+			 * Increments its argument.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#inc
 			 * @param int|float $x
@@ -4203,6 +4242,7 @@
 			}
 
 			/**
+			 * Returns the mean of the given list of numbers.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#mean
 			 * @param int[]|float[] $x
@@ -4216,6 +4256,7 @@
 			}
 
 			/**
+			 * Returns the median of the given list of numbers.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#median
 			 * @param int[]|float[] $x
@@ -4240,6 +4281,7 @@
 			}
 
 			/**
+			 * Divides the first parameter by the second and returns the remainder.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#modulo
 			 * @param float|int $x
@@ -4253,6 +4295,7 @@
 			}
 
 			/**
+			 * Multiplies two numbers. Equivalent to `$x * $y` but curried.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#multiply
 			 * @param float|int $x
@@ -4266,6 +4309,7 @@
 			}
 
 			/**
+			 * Negates its argument.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#negate
 			 * @param float|int $x
@@ -4278,8 +4322,8 @@
 			}
 
 			/**
+			 * Returns `$x` to the power of `$y`.
 			 * @internal Math
-			 * y to the power of x.
 			 * @param float|int $x
 			 * @param float|int $y
 			 * @return Closure
@@ -4291,6 +4335,7 @@
 			}
 
 			/**
+			 * Multiplies together all the elements of a list.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#product
 			 * @param float[]|int[] $x
@@ -4305,6 +4350,7 @@
 			}
 
 			/**
+			 * Returns the value of a number rounded to the nearest integer.
 			 * @internal Math
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.round
 			 * @param float|int $x
@@ -4317,6 +4363,7 @@
 			}
 
 			/**
+			 * Returns the sign of a number, indicating whether the number is positive, negative or zero.
 			 * @internal Math
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.sign
 			 * @param float|int $x
@@ -4336,6 +4383,7 @@
 			}
 
 			/**
+			 * Subtracts its second argument from its first argument.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#subtract
 			 * @param float|int $x
@@ -4349,6 +4397,7 @@
 			}
 
 			/**
+			 * Adds together all the elements of a list.
 			 * @internal Math
 			 * @link https://ramdajs.com/docs/#sum
 			 * @param float[]|int[] $x
@@ -4363,6 +4412,7 @@
 			}
 
 			/**
+			 * Returns the integer part of a number by removing any fractional digits.
 			 * @internal Math
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.trunc
 			 * @param mixed $x
