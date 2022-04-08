@@ -933,6 +933,7 @@
 			//<editor-fold desc="LIST">
 
 			/**
+			 * Applies a function to the value at the given index of an array, returning a new copy of the array with the element at the given index replaced with the result of the function application.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#adjust
 			 * @param int|string $index
@@ -949,6 +950,7 @@
 			}
 
 			/**
+			 * Returns `true` if all elements of the list match the predicate, `false` if there are any that don't.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#all
 			 * @param callable $pred
@@ -968,6 +970,7 @@
 			}
 
 			/**
+			 * Returns `true` if all items in the list are equivalent using `R::equals` for equality comparisons.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allEqual
 			 * @param array $arr
@@ -988,6 +991,7 @@
 			}
 
 			/**
+			 * Returns `true` if all items in the list are equivalent to user provided value using `R::equals` for equality comparisons.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allEqualTo
 			 * @param mixed $x
@@ -1007,6 +1011,7 @@
 			}
 
 			/**
+			 * Returns `true` if all items in the list are unique. `R::equals` is used to determine equality.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.allUnique
 			 * @param array $arr
@@ -1020,6 +1025,7 @@
 			}
 
 			/**
+			 * Returns `true` if at least one of the elements of the list match the predicate, `false` otherwise.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#any
 			 * @param callable $pred
@@ -1039,6 +1045,7 @@
 			}
 
 			/**
+			 * Returns a new list, composed of n-tuples of consecutive elements. If n is greater than the length of the list, an empty list is returned.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#aperture
 			 * @param int $size
@@ -1067,6 +1074,7 @@
 			}
 
 			/**
+			 * Returns a new list containing the contents of the given list, followed by the given element.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#append
 			 * @param mixed $val
@@ -1083,8 +1091,8 @@
 			}
 
 			/**
-			 * @internal List
 			 * Get clone of array.
+			 * @internal List
 			 * @param array $x
 			 * @return Closure
 			 */
@@ -1095,9 +1103,8 @@
 			}
 
 			/**
-			 * Modified version of "objOf" that returns a key/value pair array.
+			 * Creates an associative array containing a single `key:value` pair.
 			 * @internal List
-			 * @link https://ramdajs.com/docs/#objOf
 			 * @param string $key
 			 * @param mixed $val
 			 * @return Closure
@@ -1109,6 +1116,7 @@
 			}
 
 			/**
+			 * Maps a function over a list and concatenates the results. Is also known as `flatMap` in some libraries.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#chain
 			 * @param callable $f
@@ -1137,6 +1145,7 @@
 			}
 
 			/**
+			 * Splits a list into sub-lists, based on the result of calling a key-returning function on each element, and grouping the results according to values returned.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#collectBy
 			 * @param callable $f
@@ -1175,6 +1184,7 @@
 			}
 
 			/**
+			 * Creates an array with all falsy values removed. The values false, null, 0, "", [], and "0" are falsy.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.compact
 			 * @param array $arr
@@ -1189,6 +1199,8 @@
 			}
 
 			/**
+			 * Returns the result of concatenating the given lists or strings.
+			 * NOTE: `R::concat` expects both arguments to either be of `array` type or both be coercible to type `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#concat
 			 * @param mixed $x
@@ -1216,6 +1228,7 @@
 			}
 
 			/**
+			 * Resolves to `true` if all elements in first list are found within the second list.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#containsAll
 			 * @param string|array $x
@@ -1230,6 +1243,7 @@
 			}
 
 			/**
+			 * Returns `true` if any of the items from first array are in the second array.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#containsAny
 			 * @param string|array $x
@@ -1244,6 +1258,7 @@
 			}
 
 			/**
+			 * Returns `true` if any of the items from first array is not the second array.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#containsNone
 			 * @param string|array $x
@@ -1258,6 +1273,8 @@
 			}
 
 			/**
+			 * Returns the result of concatenating the given lists or strings.
+			 * NOTE: `R::concat` expects both arguments to be of the same type.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#concat
 			 * @param string|array $x
@@ -1282,6 +1299,7 @@
 			}
 
 			/**
+			 * Returns the number of items in a given list matching the predicate `$pred`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#count
 			 * @param callable $pred
@@ -1309,6 +1327,7 @@
 			}
 
 			/**
+			 * Returns all but the first `n` elements of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#drop
 			 * @param int $count
@@ -1332,6 +1351,7 @@
 			}
 
 			/**
+			 * Returns a list containing all but the last `n` elements of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#dropLast
 			 * @param int $count
@@ -1355,6 +1375,7 @@
 			}
 
 			/**
+			 * Returns a new list excluding all the tailing elements of a given list which satisfy the supplied predicate function. It passes each value from the right to the supplied predicate function, skipping elements until the predicate function returns a falsy value. The predicate function is applied to one argument.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#dropLastWhile
 			 * @param callable $pred
@@ -1378,6 +1399,7 @@
 			}
 
 			/**
+			 * Returns a new list without any consecutively repeating elements.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#dropRepeats
 			 * @param array $x
@@ -1398,6 +1420,7 @@
 			}
 
 			/**
+			 * Returns a new list without any consecutively repeating elements. Equality is determined by applying the supplied predicate to each pair of consecutive elements. The first element in a series of equal elements will be preserved.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#dropRepeatsWith
 			 * @param callable $pred
@@ -1421,6 +1444,7 @@
 			}
 
 			/**
+			 * Returns a new list excluding the leading elements of a given list which satisfy the supplied predicate function. It passes each value to the supplied predicate function, skipping elements while the predicate function returns `true`. The predicate function is applied to one argument.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#dropWhile
 			 * @param callable $pred
@@ -1457,6 +1481,7 @@
 			}
 
 			/**
+			 * Creates pair. Every item of pair is equal to input parameter.
 			 * @internal Logic
 			 * @link https://ramda-extension.firebaseapp.com/docs/#duplicate
 			 * @param mixed $x
@@ -1469,6 +1494,7 @@
 			}
 
 			/**
+			 * Iterate over an input list, calling a provided function `$f` for each element in the list. `$f` receives one argument
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#forEach
 			 * @param callable $f
@@ -1486,6 +1512,7 @@
 			}
 
 			/**
+			 * Checks if a list ends with the provided sublist. Similarly, checks if a string ends with the provided substring.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#endsWith
 			 * @param mixed $val
@@ -1508,6 +1535,7 @@
 			}
 
 			/**
+			 * Wraps input in an `array` if it's not an `array` already.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#ensureArray
 			 * @param mixed $x
@@ -1520,6 +1548,7 @@
 			}
 
 			/**
+			 * Takes a predicate and a `string`, `object` or `array`, and returns a new value of the same type containing the members of the given filterable which satisfy the given predicate.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#filter
 			 * @param callable $pred
@@ -1554,6 +1583,7 @@
 			}
 
 			/**
+			 * Returns the first element of the list which matches the predicate, or `null` if no element matches.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#find
 			 * @param callable $pred
@@ -1573,8 +1603,8 @@
 			}
 
 			/**
-			 * @internal List
 			 * Returns array of items found at provided indexes. If index doesn't exist, null is returned.
+			 * @internal List
 			 * @param int[]|string[] $idxs
 			 * @param array $arr
 			 * @return Closure
@@ -1588,6 +1618,7 @@
 			}
 
 			/**
+			 * Returns the index of the first element of the list which matches the predicate, or `-1` if no element matches.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#findIndex
 			 * @param callable $pred
@@ -1607,6 +1638,7 @@
 			}
 
 			/**
+			 * Returns the last element of the list which matches the predicate, or `null` if no element matches.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#findLast
 			 * @param callable $pred
@@ -1626,6 +1658,7 @@
 			}
 
 			/**
+			 * Returns the index of the last element of the list which matches the predicate, or `-1` if no element matches.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#findLastIndex
 			 * @param callable $pred
@@ -1645,6 +1678,7 @@
 			}
 
 			/**
+			 * Returns first not `null` value.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#findNotNil
 			 * @param array $arr
@@ -1663,6 +1697,7 @@
 			}
 
 			/**
+			 * Returns a new list by pulling every item out of it (and all its sub-arrays) and putting them in a new array, depth-first.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#flatten
 			 * @param array $arr
@@ -1682,6 +1717,7 @@
 			}
 
 			/**
+			 * Creates a new object from a list key-value pairs. If a key appears in multiple pairs, the rightmost pair is included in the object.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#fromPairs
 			 * @param array $arr
@@ -1701,6 +1737,7 @@
 			}
 
 			/**
+			 * Splits a list into sub-lists stored in an object, based on the result of calling a key-returning function on each element, and grouping the results according to values returned.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#groupBy
 			 * @param callable $keyFunc
@@ -1724,6 +1761,7 @@
 			}
 
 			/**
+			 * Takes a list and returns a list of lists where each sublist's elements are all satisfied pairwise comparison according to the provided function. Only adjacent elements are passed to the comparison function.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#groupWith
 			 * @param callable $compareFunc
@@ -1752,6 +1790,7 @@
 			}
 
 			/**
+			 * Returns `true` if length of array is smaller than first argument.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#gtThanLength
 			 * @param int $length
@@ -1765,6 +1804,7 @@
 			}
 
 			/**
+			 * Returns `true` if length of array is smaller or equals than first argument.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#gteThanLength
 			 * @param int $length
@@ -1778,6 +1818,7 @@
 			}
 
 			/**
+			 * Returns the first element of the given `array` or `string`. In some libraries this function is named `first`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#head
 			 * @param array $arr
@@ -1790,6 +1831,7 @@
 			}
 
 			/**
+			 * Returns `true` if the specified value is equal, in `R::equals` terms, to at least one element of the given list; false otherwise. Also works with `strings` and `objects`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#includes
 			 * @param mixed $searchFor
@@ -1816,6 +1858,7 @@
 			}
 
 			/**
+			 * Given a function that generates a key, turns a list of objects into an object indexing the objects by the given key. Note that if multiple objects generate the same value for the indexing key only the last value will be included in the generated object.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#indexBy
 			 * @param callable $keyFunc
@@ -1836,6 +1879,7 @@
 			}
 
 			/**
+			 * Returns the position of the first occurrence of an item in an array, or `-1` if the item is not included in the array. `R::equals` is used to determine equality.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#indexOf
 			 * @param int|string $idx
@@ -1855,18 +1899,30 @@
 			}
 
 			/**
+			 * Returns all but the last element of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#init
-			 * @param array $arr
+			 * @param array|string $x
 			 * @return Closure
 			 */
 			public static function init(...$args){
-				return static::curryN(1, function($arr){
-					return array_slice($arr, 0, -1);
+				return static::curryN(1, function($x){
+					$type = gettype($x);
+
+					if($type === 'array'){
+						return array_slice($x, 0, -1);
+					}
+					elseif($type === 'string'){
+						return implode(array_slice(str_split($x), 0, -1));
+					}
+
+					return $x;
 				})(...$args);
 			}
 
 			/**
+			 * Inserts the supplied element into the list, at the specified index.
+			 * NOTE: This is not destructive: it returns a copy of the list with the changes.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#insert
 			 * @param int $index
@@ -1883,6 +1939,8 @@
 			}
 
 			/**
+			 * Inserts the sub-list into the list, at the specified index.
+			 * NOTE: this is not destructive: it returns a copy of the list with the changes.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#insertAll
 			 * @param int $index
@@ -1899,6 +1957,7 @@
 			}
 
 			/**
+			 * Creates a new list with the separator interposed between elements.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#intersperse
 			 * @param mixed $val
@@ -1929,6 +1988,7 @@
 			 */
 
 			/**
+			 * Returns a `string` made by inserting the separator between each element and concatenating all the elements into a single string.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#join
 			 * @param string $on
@@ -1942,18 +2002,32 @@
 			}
 
 			/**
+			 * Returns the last element of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#last
-			 * @param array $arr
+			 * @param array|string $x
 			 * @return Closure
 			 */
 			public static function last(...$args){
-				return static::curryN(1, function($arr){
-					return end($arr);
+				return static::curryN(1, function($x){
+					$type = gettype($x);
+
+					if($type === 'array'){
+						$arr = static::arrayClone($x);
+						return end($arr);
+					}
+
+					if($type === 'string'){
+						$arr = str_split($x);
+						return end($arr);
+					}
+
+					return $x;
 				})(...$args);
 			}
 
 			/**
+			 * Returns the position of the last occurrence of an item in an `array`, or `-1` if the item is not included in the `array`. `R::equals` is used to determine equality.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#lastIndexOf
 			 * @param mixed $x
@@ -1973,6 +2047,7 @@
 			}
 
 			/**
+			 * Returns the number of elements in `$x`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#length
 			 * @param string|array|object $x
@@ -1997,6 +2072,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length equal to `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthEq
 			 * @param int $length
@@ -2011,6 +2087,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length greater than `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthGt
 			 * @param int $length
@@ -2025,6 +2102,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length greater than or equal to `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthGte
 			 * @param int $length
@@ -2039,6 +2117,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length less than `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthLt
 			 * @param int $length
@@ -2053,6 +2132,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length less than or equal to `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthLte
 			 * @param int $length
@@ -2067,6 +2147,7 @@
 			}
 
 			/**
+			 * Returns `true` if the supplied `array` or `string` has a length not equal to `$length`.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.lengthNotEq
 			 * @param int $length
@@ -2081,6 +2162,7 @@
 			}
 
 			/**
+			 * Returns `true` if length of `array` is bigger than first argument.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#ltThanLength
 			 * @param int $length
@@ -2094,6 +2176,7 @@
 			}
 
 			/**
+			 * Returns `true` if length of `array` is bigger or equal to first argument.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#lteThanLength
 			 * @param int $length
@@ -2107,7 +2190,8 @@
 			}
 
 			/**
-			 * NOTE: This function preserves existing `Array` keys.
+			 * Takes a function and a functor, applies the function to each of the functor's values, and returns a functor of the same shape.
+			 * NOTE: This function preserves existing `array` keys.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#map
 			 * @param callable $mapper - receives $value, $key and $index args
@@ -2158,6 +2242,7 @@
 			}
 
 			/**
+			 * Map using function that is provided with each value of the list and its index in the list.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#mapIndexed
 			 * @param callable $mapper
@@ -2194,6 +2279,7 @@
 			}
 
 			/**
+			 * Behaves like a combination of map and reduce; it applies a function to each element of a list, passing an accumulating parameter from left to right, and returning a final value of this accumulator together with the new list.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#mapAccum
 			 * @param callable $f
@@ -2219,6 +2305,7 @@
 			}
 
 			/**
+			 * Behaves like a combination of map and reduce; it applies a function to each element of a list, passing an accumulating parameter from right to left, and returning a final value of this accumulator together with the new list. Similar to `R::mapAccum`, except moves through the input list from the right to the left.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#mapAccumRight
 			 * @param callable $f
@@ -2243,6 +2330,7 @@
 			}
 
 			/**
+			 * Creates one new object with the properties from a list of objects. If a key exists in more than one object, the value from the last object it exists in will be used.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#mergeAll
 			 * @param array $arr
@@ -2261,6 +2349,7 @@
 			}
 
 			/**
+			 * Move an item, at index `$from`, to index `$to`, in a list of elements. A new list will be created containing the new elements order.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#move
 			 * @param int $from
@@ -2286,8 +2375,8 @@
 			}
 
 			/**
+			 * Unlike `R::move`, this can't move to a negative index.
 			 * @internal List
-			 * Unlike "move", this can't move to a negative index.
 			 * @param int $index
 			 * @param int $count
 			 * @param array $arr
@@ -2303,8 +2392,8 @@
 			}
 
 			/**
+			 * Unlike `R::move`, this can't move to an index beyond the final array index.
 			 * @internal List
-			 * Unlike "move", this can't move to an index beyond the final array index.
 			 * @param int $index
 			 * @param int $count
 			 * @param array $arr
@@ -2321,6 +2410,7 @@
 			}
 
 			/**
+			 * Returns `true` if no elements of the list match the predicate, `false` otherwise.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#none
 			 * @param callable $pred
@@ -2340,6 +2430,7 @@
 			}
 
 			/**
+			 * Returns `true` if at least one item of the list is repeated. `R::equals` is used to determine equality.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.notAllUnique
 			 * @param array $arr
@@ -2352,6 +2443,7 @@
 			}
 
 			/**
+			 * Returns the nth element of the given `array` or `string`. If `$index` is negative the element at index length + `$index` is returned.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#nth
 			 * @param int $index
@@ -2376,6 +2468,7 @@
 			}
 
 			/**
+			 * Returns a partial copy of an array omitting the indexes specified.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.omitIndexes
 			 * @param int[] $indexes
@@ -2397,6 +2490,7 @@
 			}
 
 			/**
+			 * Takes two arguments, `$x` and `$y`, and returns `[$x, $y]`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#pair
 			 * @param mixed $x
@@ -2410,6 +2504,7 @@
 			}
 
 			/**
+			 * Takes a predicate and a list or other filterable object and returns the pair of filterable objects of the same type of elements which do and do not satisfy, the predicate, respectively.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#partition
 			 * @param callable $pred
@@ -2456,6 +2551,7 @@
 			}
 
 			/**
+			 * Picks values from list by indexes.
 			 * @internal List
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.pickIndexes
 			 * @param int[] $indexes
@@ -2477,6 +2573,7 @@
 			}
 
 			/**
+			 * Returns a new list by plucking the same named property off of all objects in the list supplied.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#pluck
 			 * @param string $key
@@ -2490,6 +2587,7 @@
 			}
 
 			/**
+			 * Returns a new list with the given element at the front, followed by the contents of the list.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#prepend
 			 * @param mixed $x
@@ -2505,6 +2603,7 @@
 			}
 
 			/**
+			 * Returns a list of numbers from `$x` (inclusive) to `$y` (exclusive).
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#range
 			 * @param int $x
@@ -2524,8 +2623,7 @@
 			}
 
 			/**
-			 * Like 'range' function but with a definable step value.
-			 * Negative step value is required for descending range.
+			 * Like `R::range` function but with a definable step value. Negative step value is required for descending range.
 			 * @internal List
 			 * @param int $start
 			 * @param int $end
@@ -2547,6 +2645,7 @@
 			}
 
 			/**
+			 * Returns a single item by iterating through the list, successively calling the iterator function and passing it an accumulator value and the current value from the array, and then passing the result to the next call. The iterator function receives three values: `($acc, $value, $key)`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reduce
 			 * @param callable $reducer
@@ -2580,6 +2679,7 @@
 			 */
 
 			/**
+			 * Groups the elements of the list according to the result of calling the String-returning function `$keyFunc` on each element and reduces the elements of each group to a single value via the reducer function `$valueFunc`. The iterator function receives two values: `($acc, $value)`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reduceBy
 			 * @param callable $valueFunc
@@ -2600,6 +2700,7 @@
 			}
 
 			/**
+			 * Returns a single item by iterating through the list, successively calling the iterator function and passing it an accumulator value and the current value from the array, and then passing the result to the next call. Similar to `R::reduce`, except moves through the input list from the right to the left.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reduceRight
 			 * @param callable $reducer
@@ -2625,6 +2726,7 @@
 			}
 
 			/**
+			 * Like `R::reduce`, returns a single item by iterating through the list, successively calling the iterator function. Also takes a predicate that is evaluated before each step. If the predicate returns false, it "short-circuits" the iteration and returns the current value of the accumulator.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reduceWhile
 			 * @param callable $pred - Takes acc and val args.
@@ -2669,6 +2771,7 @@
 			}
 
 			/**
+			 * The complement of `R::filter`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reject
 			 * @param callable $pred
@@ -2683,7 +2786,7 @@
 			}
 
 			/**
-			 * Only applies to indexed arrays. Added because, in PHP, "array_filter" returns array with keys removed.
+			 * Only applies to indexed arrays. Added because, in PHP, `array_filter` returns `array` with keys removed.
 			 * @internal List
 			 * @param array $arr
 			 * @return Closure
@@ -2695,6 +2798,7 @@
 			}
 
 			/**
+			 * Filters out every value in a list that equals to first argument.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#rejectEq
 			 * @param mixed $x
@@ -2710,6 +2814,7 @@
 			}
 
 			/**
+			 * Filters out every `null` value in a list.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#rejectNil
 			 * @param mixed $x
@@ -2724,6 +2829,8 @@
 			}
 
 			/**
+			 * Removes the sub-list of list starting at index `$start` and containing `$count` elements.
+			 * NOTE: This is not destructive: it returns a copy of the list with the changes.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#remove
 			 * @param int $start
@@ -2751,6 +2858,7 @@
 			}
 
 			/**
+			 * Returns a fixed list of size `$count` containing a specified identical value.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#repeat
 			 * @param mixed $val
@@ -2764,6 +2872,7 @@
 			}
 
 			/**
+			 * Returns a new `array` or `string` with the elements or characters in reversed order.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#reverse
 			 * @param array|string $x
@@ -2785,6 +2894,7 @@
 			}
 
 			/**
+			 * Similar to `R::reduce`, but returns a list of successively reduced values from the left.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#scan
 			 * @param callable $reducer
@@ -2815,6 +2925,7 @@
 			 */
 
 			/**
+			 * Returns the elements of the given `array` or `string` from `$from` (inclusive) to `$to` (exclusive).
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#slice
 			 * @param int $from
@@ -2839,6 +2950,8 @@
 			}
 
 			/**
+			 * Returns a copy of the list, sorted according to the comparator function, which should accept two values at a time and return a negative number if the first value is smaller, a positive number if it's larger, and zero if they are equal.
+			 * NOTE: this is a copy of the list. It does not modify the original.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#sort
 			 * @param callable $sorter
@@ -2854,8 +2967,8 @@
 			}
 
 			/**
-			 * @internal List
 			 * Sorts a list of numbers from low to high.
+			 * @internal List
 			 * @param array $arr
 			 * @return Closure
 			 */
@@ -2872,8 +2985,8 @@
 			}
 
 			/**
-			 * @internal List
 			 * Sorts a list of numbers from high to low.
+			 * @internal List
 			 * @param array $arr
 			 * @return Closure
 			 */
@@ -2890,6 +3003,7 @@
 			}
 
 			/**
+			 * Splits a given `array` or `string` at a given index.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#splitAt
 			 * @param int $index
@@ -2917,6 +3031,7 @@
 			}
 
 			/**
+			 * Splits a collection into slices of the specified length.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#splitEvery
 			 * @param int $length
@@ -2953,6 +3068,10 @@
 			}
 
 			/**
+			 * Takes an `array` or `string` and a predicate and returns a pair of `arrays` or `strings` with the following properties:
+			 * 1. the result of concatenating the two output lists is equivalent to the input list;
+			 * 2. none of the elements of the first output list satisfies the predicate; and
+			 * 3. if the second output list is non-empty, its first element satisfies the predicate.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#splitWhen
 			 * @param callable $pred
@@ -2982,6 +3101,7 @@
 			}
 
 			/**
+			 * Checks if a list starts with the provided sublist. Similarly, checks if a string starts with the provided substring.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#startsWith
 			 * @param array|string $prefix
@@ -3006,6 +3126,7 @@
 			}
 
 			/**
+			 * Returns all but the first element of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#tail
 			 * @param string|array $x
@@ -3027,6 +3148,7 @@
 			}
 
 			/**
+			 * Returns the first n elements of the given `array` or `string`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#take
 			 * @param int $count
@@ -3049,6 +3171,7 @@
 			}
 
 			/**
+			 * Returns a new list containing the last `$count` elements of the given `array` or `string`. If `$count` > the length, returns a list of `$count` elements.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#takeLast
 			 * @param int $count
@@ -3071,6 +3194,7 @@
 			}
 
 			/**
+			 * Returns a new list containing the last n elements of a given `array` or `string`, passing each value to the supplied predicate function, and terminating when the predicate function returns `false`. Excludes the element that caused the predicate function to fail. The predicate function is passed one argument.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#takeLastWhile
 			 * @param callable $pred
@@ -3105,6 +3229,7 @@
 			}
 
 			/**
+			 * urns a new list containing the first n elements of a given `array` or `string`, passing each value to the supplied `$pred` function, and terminating when the predicate function returns `false`. Excludes the element that caused the predicate function to fail. The predicate function is passed one argument.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#takeWhile
 			 * @param callable $pred
@@ -3137,6 +3262,7 @@
 			}
 
 			/**
+			 * Calls an input function n times, returning an array containing the results of those function calls. `$f` is passed one argument: The current value of n, which begins at 0 and is gradually incremented to n - 1.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#times
 			 * @param callable $f
@@ -3162,6 +3288,7 @@
 			 */
 
 			/**
+			 * Transposes the rows and columns of a 2D list. When passed a list of n lists of length x, returns a list of x lists of length n.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#transpose
 			 * @param array $arr
@@ -3199,6 +3326,7 @@
 			 */
 
 			/**
+			 * Builds a list from a seed value. Accepts an iterator function, which returns either `false` to stop iteration or an `array` of length 2 containing the value to add to the resulting list and the seed to be used in the next call to the iterator function.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#unfold
 			 * @param callable $f
@@ -3220,6 +3348,7 @@
 			}
 
 			/**
+			 * Returns a new `array` containing only one copy of each element in the original `array`.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#uniq
 			 * @param array $arr
@@ -3232,6 +3361,7 @@
 			}
 
 			/**
+			 * Returns a new `array` containing the unique contents of the given `array`, followed by the given element.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#uniqAppend
 			 * @param mixed $x
@@ -3245,6 +3375,7 @@
 			}
 
 			/**
+			 * Returns a new `array` containing only one copy of each element in the original `array`, based upon the value returned by applying the supplied function to each list element. Prefers the first item if the supplied function produces the same value on two items. `R::equals` is used for comparison.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#uniqBy
 			 * @param callable $f
@@ -3270,6 +3401,7 @@
 			}
 
 			/**
+			 * Returns a new `array` containing the unique contents of the given `array`, starting by the given element.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#uniqPrepend
 			 * @param mixed $x
@@ -3283,6 +3415,7 @@
 			}
 
 			/**
+			 * Returns a new `array` containing only one copy of each element in the original `array`, based upon the value returned by applying the supplied predicate to two `array` elements. Prefers the first item if two items compare equal based on the predicate.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#uniqWith
 			 * @param callable $pred
@@ -3313,6 +3446,7 @@
 			}
 
 			/**
+			 * Shorthand for `R::chain(R::identity)`, which removes one level of nesting from any chain.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#unnest
 			 * @param array $arr
@@ -3325,6 +3459,7 @@
 			}
 
 			/**
+			 * Returns a new copy of the `array` with the element at the provided index replaced with the given value.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#update
 			 * @param int $index ;
@@ -3342,6 +3477,7 @@
 			}
 
 			/**
+			 * Returns a new `array` without values in the first argument. `R::equals` is used to determine equality.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#without
 			 * @param array $values ;
@@ -3363,6 +3499,7 @@
 			}
 
 			/**
+			 * Creates pairs from value and `array` of values. Value is always prepended to the pair.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#xPairs
 			 * @param mixed $x ;
@@ -3382,6 +3519,7 @@
 			}
 
 			/**
+			 * Creates pairs from value and an `array` of values. Value is always appended as the last item to the pair.
 			 * @internal List
 			 * @link https://ramda-extension.firebaseapp.com/docs/#xPairsRight
 			 * @param mixed $x ;
@@ -3401,6 +3539,7 @@
 			}
 
 			/**
+			 * Creates a new `array` out of the two supplied by creating each possible pair from the lists.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#xprod
 			 * @param array $arr1
@@ -3430,6 +3569,7 @@
 			}
 
 			/**
+			 * Creates a new `array` out of the two supplied by pairing up equally-positioned items from both lists. The returned `array` is truncated to the length of the shorter of the two input lists.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#zip
 			 * @param array $arr1
@@ -3452,6 +3592,7 @@
 			}
 
 			/**
+			 * Creates a new `object` out of a list of keys and a list of values. Key/value pairing is truncated to the length of the shorter of the two lists.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#zipObj
 			 * @param array $arr1
@@ -3466,6 +3607,7 @@
 			}
 
 			/**
+			 * Creates a new `array` out of the two supplied by applying the function to each equally-positioned pair in the lists. The returned `array` is truncated to the length of the shorter of the two input lists.
 			 * @internal List
 			 * @link https://ramdajs.com/docs/#zipWith
 			 * @param callable $f
