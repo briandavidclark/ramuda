@@ -36,6 +36,8 @@
 			 */
 
 			/**
+			 * Returns a function that always returns the given value. Note that for non-primitives the value returned is a reference to the original value.
+			 * This function is known as const, constant, or K (for K combinator) in other languages and libraries.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#always
 			 * @param mixed $x
@@ -48,6 +50,7 @@
 			}
 
 			/**
+			 * Always returns a new empty array.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysEmptyArray
 			 * @return Closure
@@ -59,6 +62,7 @@
 			}
 
 			/**
+			 * Always returns a new empty object.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysEmptyObject
 			 * @return Closure
@@ -70,6 +74,7 @@
 			}
 
 			/**
+			 * Always returns an empty string.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysEmptyString
 			 * @return Closure
@@ -81,6 +86,7 @@
 			}
 
 			/**
+			 * Always returns null.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysNull
 			 * @return Closure
@@ -92,6 +98,7 @@
 			}
 
 			/**
+			 * Always returns one.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysOne
 			 * @return Closure
@@ -103,6 +110,7 @@
 			}
 
 			/**
+			 * Always returns zero.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#alwaysZero
 			 * @return Closure
@@ -114,6 +122,7 @@
 			}
 
 			/**
+			 * Applies a list of functions to a list of values.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#ap
 			 * @param callable[] $fArr
@@ -135,6 +144,7 @@
 			}
 
 			/**
+			 * Applies, as arguments to `$f`, the array `$argArr`.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#apply
 			 * @param callable $f
@@ -148,6 +158,7 @@
 			}
 
 			/**
+			 * Given a spec object recursively mapping properties to functions, creates a function producing an object of the same structure, by mapping each property to the result of calling its associated function with the supplied arguments.
 			 * NOTE: Unlike the Ramda `applySpec` function, the max arity of the applied functions must be provided as the `$arity` arg.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#applySpec
@@ -173,6 +184,7 @@
 			}
 
 			/**
+			 * Takes a value and applies a function to it. This function is also known as the "thrush" combinator.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#applyTo
 			 * @param mixed $x
@@ -186,6 +198,7 @@
 			}
 
 			/**
+			 * Makes an ascending comparator function out of a function that returns a value that can be compared with < and >.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#ascend
 			 * @param callable $f
@@ -222,6 +235,7 @@
 			 */
 
 			/**
+			 * Returns the result of calling its first argument with the remaining arguments. This is occasionally useful as a converging function for `R::converge`: the first branch can produce a function while the remaining branches produce values to be passed to that function as its arguments.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#call
 			 * @param callable $f
@@ -232,6 +246,7 @@
 			}
 
 			/**
+			 * Makes a comparator function out of a function that reports whether the first element is less than the second.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#comparator
 			 * @param callable $pred
@@ -253,22 +268,20 @@
 			}
 
 			/**
+			 * Performs right-to-left function composition. The last argument may have any arity; the remaining arguments must be unary.
+			 * Note: The result of compose is not automatically curried.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#compose
-			 * @param callable[] ...$args
+			 * @param callable ...$fs
 			 * @return Closure
 			 */
-			public static function compose(...$args){
-				return function($val) use ($args){
-					$argsRev = array_reverse($args);
-
-					return array_reduce($argsRev, function($acc, $f){
-						return $f($acc);
-					}, $val);
-				};
+			public static function compose(...$fs){
+				return call_user_func_array('static::pipe', array_reverse($fs));
 			}
 
 			/**
+			 * Performs right-to-left function composition using transforming function. The last function may have any arity; the remaining functions must be unary.
+			 * Note: The result of `composeWith` is not automatically curried. Transforming function is not used on the last argument.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#composeWith
 			 * @param callable $f
@@ -276,16 +289,7 @@
 			 * @return Closure
 			 */
 			public static function composeWith(...$args){
-				return static::curryN(2, function($f, $fArr){
-					return function($val) use ($f, $fArr){
-						/** @var array $newFuncArr */
-						$newFuncArr = static::reverse($fArr);
-
-						return array_reduce($newFuncArr, function($acc, $fItem) use ($f){
-							return $f($fItem, $acc);
-						}, $val);
-					};
-				})(...$args);
+				return call_user_func_array('static::pipeWith', [$args[0], array_reverse($args[1])]);
 			}
 
 			/**
@@ -495,7 +499,7 @@
 							return call_user_func_array($obj[$method], $params);
 						}
 
-						return call_user_func_array(array($obj, $method), $params);
+						return call_user_func_array([$obj, $method], $params);
 					});
 				})(...$args);
 			}
@@ -586,7 +590,7 @@
 			 */
 			public static function methodRef($arity, $instance, $method){
 				return static::curryN($arity, function(...$xs) use ($instance, $method, $arity){
-					return call_user_func_array(array($instance, $method), $xs);
+					return call_user_func_array([$instance, $method], $xs);
 				});
 			}
 
@@ -4626,10 +4630,10 @@
 			 */
 			public static function lens(...$args){
 				return static::curryN(2, function($getter, $setter){
-					return array(
+					return [
 						'getter' => $getter,
 						'setter' => $setter
-					);
+					];
 				})(...$args);
 			}
 
