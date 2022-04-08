@@ -6475,6 +6475,7 @@
 			//<editor-fold desc="STRING">
 
 			/**
+			 * For not-nil `string` returns `string` where every single word starts with a capital letter.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#capitalizeAll
 			 * @param string $str
@@ -6487,6 +6488,7 @@
 			}
 
 			/**
+			 * For not-nil `string` returns `string` which starts with capital (upper-case) letter.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#capitalizeFirst
 			 * @param string $str
@@ -6499,6 +6501,7 @@
 			}
 
 			/**
+			 * Testing string ends with suffix.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#endsWithSuffix
 			 * @param string $str
@@ -6512,6 +6515,7 @@
 			}
 
 			/**
+			 * Testing string ends with suffix ignoring case.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#endsWithSuffixIgnoreCase
 			 * @param string $str
@@ -6527,6 +6531,7 @@
 			}
 
 			/**
+			 * Tests string equals ignoring case.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#equalsStringIgnoreCase
 			 * @param mixed $str1
@@ -6540,6 +6545,7 @@
 			}
 
 			/**
+			 * Tests a regular expression against a `string`.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#match
 			 * @param string $regEx
@@ -6555,6 +6561,7 @@
 			}
 
 			/**
+			 * Replace a substring.
 			 * Note: does not support regex.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#replace
@@ -6571,6 +6578,7 @@
 			}
 
 			/**
+			 * Replaces all substring matches in a `string`.
 			 * Note: does not support regex.
 			 * @internal String
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.replaceAll
@@ -6620,6 +6628,7 @@
 			}
 
 			/**
+			 * Splits a `string` into an `array` of strings based on the given separator.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#split
 			 * @param string $on
@@ -6633,6 +6642,7 @@
 			}
 
 			/**
+			 * Tests if `string` starts with prefix.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#startsWithPrefix
 			 * @param string $str
@@ -6646,6 +6656,7 @@
 			}
 
 			/**
+			 * Tests if `string` starts with prefix ignoring case.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#startsWithPrefixIgnoreCase
 			 * @param string $str
@@ -6661,6 +6672,7 @@
 			}
 
 			/**
+			 * Determines whether a given `string` matches a given regular expression.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#test
 			 * @param string $regEx
@@ -6674,6 +6686,7 @@
 			}
 
 			/**
+			 * Converts `string` into camelCase.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toCamelCase
 			 * @param string $str
@@ -6689,6 +6702,7 @@
 			}
 
 			/**
+			 * Converts `string` into CONST_CASE.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toScreamingSnakeCase
 			 * @param string $str
@@ -6703,6 +6717,7 @@
 			}
 
 			/**
+			 * Converts `string` into kebab-case.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toKebabCase
 			 * @param string $str
@@ -6717,6 +6732,7 @@
 			}
 
 			/**
+			 * The lower case version of a `string`.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#toLower
 			 * @param string $str
@@ -6729,6 +6745,7 @@
 			}
 
 			/**
+			 * Converts `string` into PascalCase.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toPascalCase
 			 * @param string $str
@@ -6743,6 +6760,7 @@
 			}
 
 			/**
+			 * Converts `string` into snake_case.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toSnakeCase
 			 * @param string $str
@@ -6757,6 +6775,7 @@
 			}
 
 			/**
+			 * Returns the `string` representation of the given value.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#toString
 			 * @param mixed $x
@@ -6775,6 +6794,7 @@
 			}
 
 			/**
+			 * The upper case version of a string.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#toUpper
 			 * @param string $str
@@ -6787,6 +6807,7 @@
 			}
 
 			/**
+			 * Capitalize first letter of a `string`.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toUpperFirst
 			 * @param string $str
@@ -6799,6 +6820,7 @@
 			}
 
 			/**
+			 * Removes (strips) whitespace from both ends of the `string`.
 			 * @internal String
 			 * @link https://ramdajs.com/docs/#trim
 			 * @param string $str
@@ -6811,6 +6833,7 @@
 			}
 
 			/**
+			 * Removes whitespace from the end of a `string`.
 			 * @internal String
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.trimEnd
 			 * @param string $str
@@ -6823,6 +6846,7 @@
 			}
 
 			/**
+			 * Removes whitespace from the beginning of a `string`.
 			 * @internal String
 			 * @link https://char0n.github.io/ramda-adjunct/2.24.0/RA.html#.trimStart
 			 * @param string $str
@@ -6835,6 +6859,7 @@
 			}
 
 			/**
+			 * Wraps a `string` with another set of strings.
 			 * @internal String
 			 * @param string[] $arr - can contain 1 or 2 items only
 			 * @param string $str
