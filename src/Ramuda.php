@@ -293,6 +293,7 @@
 			}
 
 			/**
+			 * Wraps a constructor function inside a curried function that can be called with the same arguments and returns the same type.
 			 * NOTE: If class is namespaced, the fully qualified name must be sent to $className.
 			 * @example R::construct('\MyNamespace\MyClass');
 			 * @internal Function
@@ -307,6 +308,7 @@
 			}
 
 			/**
+			 * Wraps a constructor function inside a curried function that can be called with the same arguments and returns the same type. The arity of the function returned is specified to allow using variadic constructor functions.
 			 * NOTE: If class is namespaced, the fully qualified name must be sent to $className.
 			 * @example R::constructN(3, '\MyNamespace\MyClass');
 			 * @internal Function
@@ -324,6 +326,7 @@
 			}
 
 			/**
+			 * Accepts a converging function and a list of branching functions and returns a new function. The arity of the new function is the same as the arity of the longest branching function. When invoked, this new function is applied to some arguments, and each branching function is applied to those same arguments. The results of each branching function are passed as arguments to the converging function to produce the return value.
 			 * NOTE: Unlike the Ramda `converge` function, the max arity of the `$fs` functions must be provided as the `$arity` arg.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#converge
@@ -343,6 +346,7 @@
 			}
 
 			/**
+			 * Returns a curried equivalent of the provided function. The curried function has two unusual capabilities. First, its arguments needn't be provided one at a time. Secondly, the special placeholder value `R::$_` may be used to specify "gaps", allowing partial application of any combination of arguments, regardless of their positions.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#curry
 			 * @param callable|null $f
@@ -354,6 +358,7 @@
 			}
 
 			/**
+			 * Returns a curried equivalent of the provided function, with the specified arity. The curried function has two unusual capabilities. First, its arguments needn't be provided one at a time. Secondly, the special placeholder value `R::$_` may be used to specify "gaps", allowing partial application of any combination of arguments, regardless of their positions.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#curryN
 			 * @param int|null $n
@@ -400,6 +405,7 @@
 			}
 
 			/**
+			 * Makes a descending comparator function out of a function that returns a value that can be compared with < and >.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#descend
 			 * @param callable $f
@@ -424,6 +430,7 @@
 			}
 
 			/**
+			 * Returns the empty value of its argument's type.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#empty
 			 * @param mixed $x
@@ -454,6 +461,7 @@
 			}
 
 			/**
+			 * A function that always returns `false`. Any passed in parameters are ignored.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#F
 			 * @return Closure
@@ -465,6 +473,7 @@
 			}
 
 			/**
+			 * Returns a new function much like the supplied one, except that the first two arguments' order is reversed.
 			 * NOTE: Unlike the Ramda `flip` function, the arity of the `$f` function must be provided as the `$arity` arg.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#flip
@@ -483,6 +492,7 @@
 			}
 
 			/**
+			 * Turns a named method with a specified arity into a function that can be called directly supplied with arguments and a target object. The returned function is curried and accepts arity + 1 parameters where the final parameter is the target object.
 			 * NOTE: Returned function will also accept an array.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#invoker
@@ -505,8 +515,8 @@
 			}
 
 			/**
-			 * @internal Function
 			 * Hooks into a pipeline.
+			 * @internal Function
 			 * @param callable $f
 			 * @param mixed $val
 			 * @return Closure
@@ -518,6 +528,7 @@
 			}
 
 			/**
+			 * A function that does nothing but return the parameter supplied to it. Good as a default or placeholder function.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#identity
 			 * @param mixed $x
@@ -530,6 +541,7 @@
 			}
 
 			/**
+			 * Applies a list of functions to a list of values.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#juxt
 			 * @param callable[] $fArr
@@ -556,6 +568,7 @@
 			 */
 
 			/**
+			 * Creates a new function that, when invoked, caches the result of calling `$f` for a given argument set and returns the result. Subsequent calls to the memoized `$f` with the same argument set will not result in an additional call to `$f`; instead, the cached result for that set of arguments will be returned. Care must be taken when implementing key generation to avoid key collision, or if tracking references, memory leaks and mutating arguments.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#memoizeWith
 			 * @param callable $keyF - must return an int or string value
@@ -581,7 +594,6 @@
 			 * Returns a curried "reference" to a class method. Similar to "invoker" but
 			 * returned function does not require the instance to be passed as an argument.
 			 * Useful because PHP class methods can't be called by reference.
-			 *
 			 * @internal Function
 			 * @param int $arity - the class method arity
 			 * @param object $instance - a class instance
@@ -601,6 +613,7 @@
 			 */
 
 			/**
+			 * Returns a function which returns its nth argument.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#nthArg
 			 * @param int $index
@@ -613,6 +626,7 @@
 			}
 
 			/**
+			 * A curried composition function that returns a unary function. Like `R::compose`, o performs right-to-left function composition. Unlike `R::compose`, the rightmost function passed to o will be invoked with only one argument. Also, unlike `R::compose`, `R::o` is limited to accepting only 2 unary functions. The name o was chosen because of its similarity to the mathematical composition operator ∘.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#o
 			 * @param callable $f1
@@ -627,6 +641,7 @@
 			}
 
 			/**
+			 * Returns a singleton array containing the value provided.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#of
 			 * @param int $x
@@ -639,6 +654,7 @@
 			}
 
 			/**
+			 * Takes a binary function `$f1`, a unary function `$f2`, and two values. Applies `$f2` to each value, then applies the result of each to $f1`. Also known as the P combinator.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#on
 			 * @param callable $f1
@@ -654,6 +670,7 @@
 			}
 
 			/**
+			 * Accepts a function `$f` and returns a function that guards invocation of `$f` such that `$f` can only ever be called once, no matter how many times the returned function is invoked. The first value calculated is returned in subsequent invocations.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#once
 			 * @param callable $f
@@ -680,6 +697,7 @@
 			 */
 
 			/**
+			 * Takes a function `$f` and a list of arguments, and returns a function g. When applied, g returns the result of applying `$f` to the arguments provided initially followed by the arguments provided to g.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partial
 			 * @param callable $f
@@ -693,6 +711,7 @@
 			}
 
 			/**
+			 * Takes a function `$f` and an object, and returns a function g. When applied, g returns the result of applying `$f` to the object provided initially merged deeply (right) with the object provided as an argument to g.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partialObject
 			 * @param callable $f
@@ -708,6 +727,7 @@
 			}
 
 			/**
+			 * Takes a function `$f` and a list of arguments, and returns a function g. When applied, g returns the result of applying `$f` to the arguments provided to g followed by the arguments provided initially.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#partialRight
 			 * @param callable $f
@@ -721,6 +741,8 @@
 			}
 
 			/**
+			 * Performs left-to-right function composition. The first argument may have any arity; the remaining arguments must be unary. In some libraries this function is named sequence.
+			 * Note: The result of pipe is not automatically curried.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#pipe
 			 * @param callable ...$fs
@@ -751,6 +773,8 @@
 			}
 
 			/**
+			 * Performs left-to-right function composition using transforming function. The first function may have any arity; the remaining functions must be unary.
+			 * Note: The result of pipeWith is not automatically curried. Transforming function is not used on the first argument.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#pipeWith
 			 * @param callable $f
@@ -759,15 +783,25 @@
 			 */
 			public static function pipeWith(...$args){
 				return static::curryN(2, function($f, $fArr){
-					return function($val) use ($f, $fArr){
-						return array_reduce($fArr, function($acc, $fItem) use ($f){
+					return function(...$params) use ($f, $fArr){
+						if(empty($fArr)){
+							return static::identity();
+						}
+
+						$headList = static::head($fArr);
+
+						/** @var callable[] $tailList */
+						$tailList = static::tail($fArr);
+
+						return array_reduce($tailList, function($acc, $fItem) use ($f){
 							return $f($fItem, $acc);
-						}, $val);
+						}, call_user_func_array($headList, $params));
 					};
 				})(...$args);
 			}
 
 			/**
+			 * A function that always returns true. Any passed in parameters are ignored.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#T
 			 * @return Closure
@@ -779,6 +813,7 @@
 			}
 
 			/**
+			 * Runs the given function with the supplied object, then returns the object.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#tap
 			 * @param callable $f
@@ -793,6 +828,7 @@
 			}
 
 			/**
+			 * Returns the opposite value comparing against a given set of two values.
 			 * @internal Function
 			 * @link https://ramda-extension.firebaseapp.com/docs/#toggle
 			 * @param mixed $val1
@@ -820,6 +856,7 @@
 			 */
 
 			/**
+			 * Creates a thunk out of a function. A thunk delays a calculation until its result is needed, providing lazy evaluation of arguments.
 			 * NOTE: Unlike Ramda `thunkify`, arity of `$f` must be provided as `$arity` arg.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#thunkify
@@ -838,6 +875,7 @@
 			}
 
 			/**
+			 * Takes two functions, a tryer and a catcher. The returned function evaluates the tryer; if it does not throw, it simply returns the result. If the tryer does throw, the returned function evaluates the catcher function and returns its result. Note that for effective composition with this function, both the tryer and catcher functions must return the same type of results.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#tryCatch
 			 * @param callable $tryer
@@ -856,6 +894,11 @@
 			}
 
 			/**
+			 * Takes a function `$f`, which takes a single array argument, and returns a function which:
+			 * 1. takes any number of positional arguments;
+			 * 2. passes these arguments to `$f` as an array; and
+			 * 3. returns the result.
+			 * In other words, `R::unapply` derives a variadic function from a function which takes an array. `R::unapply` is the inverse of `R::apply`.
 			 * @internal Function
 			 * @link https://ramdajs.com/docs/#unapply
 			 * @param callable $f
@@ -4098,7 +4141,7 @@
 			 */
 			public static function pow(...$args){
 				return static::curryN(2, function($x, $y){
-					return pow($y, $x);
+					return pow($x, $y);
 				})(...$args);
 			}
 
@@ -5929,7 +5972,7 @@
 			 */
 			public static function max(...$args){
 				return static::curryN(2, function($x, $y){
-					return max($y, $x);
+					return max($x, $y);
 				})(...$args);
 			}
 
@@ -5956,7 +5999,7 @@
 			 */
 			public static function min(...$args){
 				return static::curryN(2, function($x, $y){
-					return min($y, $x);
+					return min($x, $y);
 				})(...$args);
 			}
 
