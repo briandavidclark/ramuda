@@ -326,6 +326,49 @@
 			}
 
 			/**
+			 * Returns an iterable generator function which encapsulates the pattern of requiring
+			 * data from a previous invocation to be able to proceed to the next (for example, calling
+			 * an API endpoint with a continuation token from a previous call or calling an API endpoint
+			 * with a result count offset).
+			 *
+			 * @example
+			 * $iterator = R::continuationIterator(
+			 *     fn($lastResult, $counter) => someApiCallFunction($lastResult['token'] ?? null),
+			 *     fn($lastResult) => $lastResult['token'] !== null
+			 * );
+			 *
+			 * foreach($iterator() as $result){
+			 *     //do something with each result set
+			 * }
+			 *
+			 * @internal Function
+			 * @param callable $f - Receives `last result` of `f` (`null` on first iteration) and `counter` (starts with `1`) as arguments. Must return results.
+			 * @param callable $pred - Must return a `bool` which determines whether to continue. Receives `last result` of `f`.
+			 * @return Closure
+			 */
+			public static function continuationIterator(...$args){
+				return static::curryN(2, function($f, $pred){
+					return function() use ($f, $pred){
+						$more = true;
+						$prev = null;
+						$c = 1;
+
+						while($more){
+							$result = $f($prev, $c);
+							yield $result;
+
+							$prev = $result;
+							$c++;
+
+							if(!$pred($result)){
+								$more = false;
+							}
+						}
+					};
+				})(...$args);
+			}
+
+			/**
 			 * Accepts a converging function and a list of branching functions and returns a new function. The arity of the new function is the same as the arity of the longest branching function. When invoked, this new function is applied to some arguments, and each branching function is applied to those same arguments. The results of each branching function are passed as arguments to the converging function to produce the return value.
 			 * NOTE: Unlike the Ramda `converge` function, the max arity of the `$fs` functions must be provided as the `$arity` arg.
 			 * @internal Function
