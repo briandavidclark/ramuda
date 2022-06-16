@@ -357,12 +357,12 @@
 							$result = $f($prev, $c);
 							yield $result;
 
-							$prev = $result;
-							$c++;
-
-							if(!$pred($result)){
+							if(!$pred($result, $c)){
 								$more = false;
 							}
+
+							$prev = $result;
+							$c++;
 						}
 					};
 				})(...$args);
