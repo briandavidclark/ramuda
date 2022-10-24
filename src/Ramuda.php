@@ -6544,6 +6544,19 @@
 			}
 
 			/**
+			 * Does `$str` contain `$substr`?
+			 * @internal String
+			 * @param string $substr
+			 * @param string $str
+			 * @return Closure
+			 */
+			public static function contains(...$args){
+				return static::curryN(2, function($substr, $str){
+					return strpos($str, $substr) !== false;
+				})(...$args);
+			}
+
+			/**
 			 * Testing string ends with suffix.
 			 * @internal String
 			 * @link https://ramda-extension.firebaseapp.com/docs/#endsWithSuffix
