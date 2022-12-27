@@ -418,8 +418,7 @@
 						$args = func_get_args();
 
 						while($combinedIdx < count($recv) || $argsIdx < count($args)){
-							if($combinedIdx < count($recv)
-								&& ($recv[$combinedIdx] !== static::$_ || $argsIdx > count($args))){
+							if($combinedIdx < count($recv) && ($recv[$combinedIdx] !== static::$_ || $argsIdx > count($args))){
 								$result = $recv[$combinedIdx];
 							}
 							else{
