@@ -4528,9 +4528,17 @@
 						$type = gettype($current);
 
 						if($type === 'array'){
+							if(!array_key_exists($keys[$n], $current)){
+								$current[$keys[$n]] = [];
+							}
+
 							$current = &$current[$keys[$n]];
 						}
 						elseif($type === 'object'){
+							if(!property_exists($current, $keys[$n])){
+								$current->{$keys[$n]} = new stdClass();
+							}
+
 							$current = &$current->{$keys[$n]};
 						}
 
