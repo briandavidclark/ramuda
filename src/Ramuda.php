@@ -5633,6 +5633,55 @@
 			}
 
 			/**
+			 * Returns a copy of the original `array` or `object` (`$x`) with the keys renamed to the values of the corresponding key in `$map`. If there is no corresponding key in `$map`, the key is copied without alteration.
+			 * @example
+			 * $map = ['key1' => 'keyOne'];
+			 * $arr = ['key1' => 111, 'key2' => 222];
+			 * R::renameKeys($map, $arr); //--> ['keyOne' => 111, 'key2' => 222]
+			 *
+			 * @internal Object
+			 * @param object|array $map
+			 * @param object|array|mixed $x
+			 * @return Closure
+			 */
+			public static function renameKeys(...$args){
+				return static::curryN(2, function($map, $x){
+					$type = gettype($x);
+
+					if($type === 'object'){
+						$result = new stdClass();
+
+						foreach(get_object_vars($x) as $key => $val){
+							if(property_exists($map, $key) && property_exists($x, $key)){
+								$result->{$map->{$key}} = $x->{$key};
+							}
+							else{
+								$result->{$key} = $x->{$key};
+							}
+						}
+
+						return $result;
+					}
+					elseif($type === 'array'){
+						$result = [];
+
+						foreach($x as $key => $val){
+							if(array_key_exists($key, $map) && array_key_exists($key, $x)){
+								$result[$map[$key]] = $val;
+							}
+							else{
+								$result[$key] = $val;
+							}
+						}
+
+						return $result;
+					}
+
+					return $x;
+				})(...$args);
+			}
+
+			/**
 			 * Returns the result of "setting" the portion of the given data structure focused by the given lens to the given value.
 			 * @internal Object
 			 * @link https://ramdajs.com/docs/#set
